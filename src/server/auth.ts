@@ -1,13 +1,14 @@
-import type { GetServerSidePropsContext } from "next";
-import {
-  getServerSession,
-  type NextAuthOptions,
-  type DefaultSession,
-} from "next-auth";
-import DiscordProvider from "next-auth/providers/discord";
+import { scryptSync } from "node:crypto";
+
+import Credentials from "next-auth/providers/credentials";
+import { getServerSession } from "next-auth";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { env } from "../env.mjs";
+import type { GetServerSidePropsContext } from "next";
+import type { NextAuthOptions, DefaultSession } from "next-auth";
+import type { DefaultJWT } from "next-auth/jwt";
+
 import { prisma } from "./db";
+import { env } from "../env.mjs";
 
 /**
  * Module augmentation for `next-auth` types.
@@ -19,16 +20,27 @@ import { prisma } from "./db";
 declare module "next-auth" {
   interface Session extends DefaultSession {
     user: {
+      name: string;
       id: string;
       // ...other properties
+      isAdmin: boolean;
       // role: UserRole;
-    } & DefaultSession["user"];
+    }; // & DefaultSession["user"];
   }
 
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
+  interface User {
+    // ...other properties
+    isAdmin: boolean;
+    // role: UserRole;
+  }
+}
+declare module "next-auth/jwt" {
+  interface JWT extends DefaultJWT {
+    id: string;
+    // ...other properties
+    isAdmin: boolean;
+    // role: UserRole;
+  }
 }
 
 /**
@@ -38,30 +50,79 @@ declare module "next-auth" {
  * @see https://next-auth.js.org/configuration/options
  **/
 export const authOptions: NextAuthOptions = {
+  session: { strategy: "jwt" },
+  debug: env.NODE_ENV === "development",
+  pages: {
+    // TODO: add custom pages here
+  },
   callbacks: {
-    session({ session, user }) {
+    session({ session, token }) {
       if (session.user) {
-        session.user.id = user.id;
+        session.user.id = token.id;
+        session.user.isAdmin = token.isAdmin;
         // session.user.role = user.role; <-- put other properties on the session here
       }
       return session;
     },
+    jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.isAdmin = user.isAdmin;
+      }
+      return token;
+    },
   },
   adapter: PrismaAdapter(prisma),
   providers: [
-    DiscordProvider({
-      clientId: env.DISCORD_CLIENT_ID,
-      clientSecret: env.DISCORD_CLIENT_SECRET,
+    Credentials({
+      name: "Credentials",
+      credentials: {
+        username: {
+          label: "Username",
+          type: "text",
+        },
+        password: {
+          label: "Password",
+          type: "text",
+        },
+      },
+      /**
+       * This function gets the user object by username. If it does not exist,
+       * it eventually returns `null`. If it does exist, it securely checks
+       * if the provided password is correct.
+       *
+       * The check happens even if the user does not exist to prevent timing
+       * attacks, where the attacker could find out if a username exists by
+       * measuring the time it takes to get a response.
+       *
+       * @returns User | null
+       */
+      async authorize(credentials) {
+        if (!credentials?.username || !credentials?.password) {
+          return null;
+        }
+        // exclude passwordHash and salt for better security
+        const { salt, passwordHash, ...user } = (await prisma.user.findUnique({
+          where: { name: credentials.username },
+        })) ?? {
+          salt: Buffer.from("very secure"),
+          passwordHash: Buffer.from("timing attack mitigation"),
+          id: undefined,
+        };
+        const providedPasswordHash = scryptSync(
+          credentials.password,
+          salt,
+          128
+        );
+        if (
+          providedPasswordHash.compare(passwordHash) !== 0 ||
+          user.id === undefined
+        ) {
+          return null;
+        }
+        return user;
+      },
     }),
-    /**
-     * ...add more providers here
-     *
-     * Most other providers require a bit more work than the Discord provider.
-     * For example, the GitHub provider requires you to add the
-     * `refresh_token_expires_in` field to the Account model. Refer to the
-     * NextAuth.js docs for the provider you want to use. Example:
-     * @see https://next-auth.js.org/providers/github
-     **/
   ],
 };
 
