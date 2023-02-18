@@ -17,7 +17,6 @@
  */
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import { type Session } from "next-auth";
-
 import { getServerAuthSession } from "../auth";
 import { prisma } from "../db";
 
@@ -103,7 +102,7 @@ export const publicProcedure = t.procedure;
  * procedure.
  */
 const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user) {
+  if (!ctx.session?.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   return next({
@@ -116,7 +115,7 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
 
 // ENHANCE: use chaining instead
 const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user) {
+  if (!ctx.session?.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
   if (!ctx.session.user.isAdmin) {

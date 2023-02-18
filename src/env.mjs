@@ -16,12 +16,12 @@ const server = z.object({
     // Since NextAuth.js automatically uses the VERCEL_URL if present.
     (str) => process.env.VERCEL_URL ?? str,
     // VERCEL_URL doesn't include `https` so it cant be validated as a URL
-    process.env.VERCEL ? z.string().min(1) : z.string().url()
+    process.env.VERCEL ? z.string().min(1) : z.string().url(),
   ),
   NEXTAUTH_URL_INTERNAL: z.preprocess(
     (str) => str ?? process.env.VERCEL_URL ?? process.env.NEXTAUTH_URL,
     // VERCEL_URL doesn't include `https` so it cant be validated as a URL
-    process.env.VERCEL ? z.string().min(1) : z.string().url()
+    process.env.VERCEL ? z.string().min(1) : z.string().url(),
   ),
 });
 
@@ -68,10 +68,10 @@ if (!process.env.SKIP_ENV_VALIDATION) {
       : client.safeParse(processEnv) // on client we can only validate the ones that are exposed
   );
 
-  if (parsed.success === false) {
+  if (!parsed.success) {
     console.error(
       "❌ Invalid environment variables:",
-      parsed.error.flatten().fieldErrors
+      parsed.error.flatten().fieldErrors,
     );
     throw new Error("Invalid environment variables");
   }
@@ -85,7 +85,7 @@ if (!process.env.SKIP_ENV_VALIDATION) {
         throw new Error(
           process.env.NODE_ENV === "production"
             ? "❌ Attempted to access a server-side environment variable on the client"
-            : `❌ Attempted to access server-side environment variable '${prop}' on the client`
+            : `❌ Attempted to access server-side environment variable '${prop}' on the client`,
         );
       return target[/** @type {keyof typeof target} */ (prop)];
     },

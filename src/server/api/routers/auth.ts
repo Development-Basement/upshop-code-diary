@@ -1,9 +1,7 @@
 import { type User } from "@prisma/client";
 import { randomBytes, scryptSync } from "node:crypto";
-
 import { z } from "zod";
-
-import { createTRPCRouter, adminProcedure } from "../trpc";
+import { adminProcedure, createTRPCRouter } from "../trpc";
 
 function removeAuthData(user: User) {
   // @reason: we don't want to send the password hash and salt to the client
@@ -18,7 +16,7 @@ export const authRouter = createTRPCRouter({
       z.object({
         name: z.string().regex(/^[a-zA-Z0-9-_]{3,15}$/), // 3-15 chars, letters, numbers, - and _
         password: z.string().min(6).regex(/^\S*$/), // no whitespace
-      })
+      }),
     )
     .mutation(async ({ input, ctx }) => {
       // TODO: check if user with this name or salt already exists

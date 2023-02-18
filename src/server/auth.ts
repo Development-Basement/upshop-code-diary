@@ -1,14 +1,15 @@
-import { scryptSync } from "node:crypto";
-
-import Credentials from "next-auth/providers/credentials";
-import { getServerSession } from "next-auth";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import type { GetServerSidePropsContext } from "next";
-import type { NextAuthOptions, DefaultSession } from "next-auth";
+import type { DefaultSession, NextAuthOptions } from "next-auth";
+import { getServerSession } from "next-auth";
 import type { DefaultJWT } from "next-auth/jwt";
-
-import { prisma } from "./db";
+import Credentials from "next-auth/providers/credentials";
+import { scryptSync } from "node:crypto";
 import { env } from "../env.mjs";
+import { prisma } from "./db";
+
+// we use interfaces for module augmentation
+/* eslint @typescript-eslint/consistent-type-definitions: "off" */
 
 /**
  * Module augmentation for `next-auth` types.
@@ -57,11 +58,9 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id;
-        session.user.isAdmin = token.isAdmin;
-        // session.user.role = user.role; <-- put other properties on the session here
-      }
+      session.user.id = token.id;
+      session.user.isAdmin = token.isAdmin;
+      // session.user.role = user.role; <-- put other properties on the session here
       return session;
     },
     jwt({ token, user }) {
@@ -98,7 +97,7 @@ export const authOptions: NextAuthOptions = {
        * @returns User | null
        */
       async authorize(credentials) {
-        if (!credentials?.username || !credentials?.password) {
+        if (credentials === undefined) {
           return null;
         }
         // exclude passwordHash and salt for better security
@@ -112,7 +111,7 @@ export const authOptions: NextAuthOptions = {
         const providedPasswordHash = scryptSync(
           credentials.password,
           salt,
-          128
+          128,
         );
         if (
           providedPasswordHash.compare(passwordHash) !== 0 ||
