@@ -114,6 +114,22 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
   });
 });
 
+// ENHANCE: use chaining instead
+const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
+  if (!ctx.session || !ctx.session.user) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+  if (!ctx.session.user.isAdmin) {
+    throw new TRPCError({ code: "FORBIDDEN" });
+  }
+  return next({
+    ctx: {
+      // infers the `session` as non-nullable
+      session: { ...ctx.session, user: ctx.session.user },
+    },
+  });
+});
+
 /**
  * Protected (authenticated) procedure
  *
@@ -124,3 +140,12 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
+
+/**
+ * Admin (authenticated) procedure
+ *
+ * If you want a query or mutation to ONLY be accessible to logged in admins, use
+ * this. It verifies the session is valid, guarantees `ctx.session.user` is
+ * not null and `ctx.session.user.isAdmin` is true.
+ */
+export const adminProcedure = t.procedure.use(enforceUserIsAdmin);
