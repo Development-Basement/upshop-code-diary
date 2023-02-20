@@ -29,6 +29,7 @@
     "semi": ["error", "always"],
     "tailwindcss/no-arbitrary-value": "warn",
     "tailwindcss/no-contradicting-classname": "off",
+    "tailwindcss/no-custom-classname": "off",
     "@typescript-eslint/consistent-type-definitions": ["warn", "type"]
   }
 }
