@@ -2,6 +2,7 @@ import { type NextPage } from "next";
 import { useState } from "react";
 import type { DiaryRecordProps } from "../components/diaryRecord";
 import DiaryRecord from "../components/diaryRecord";
+import Header from "../components/header";
 import PageWrapper from "../components/pageWrapper";
 
 const Dashboard: NextPage = () => {
@@ -36,21 +37,24 @@ const Dashboard: NextPage = () => {
   ]);
 
   return (
-    <PageWrapper>
-      {recordProps.map((record, i) => {
-        return (
-          <DiaryRecord
-            key={i}
-            name={record.name}
-            language={record.language}
-            duration={record.duration}
-            date={record.date}
-            description={record.description}
-            rating={record.rating}
-          />
-        );
-      })}
-    </PageWrapper>
+    <div className="h-full min-h-screen bg-gradient-to-b from-zinc-600 to-zinc-900">
+      <Header />
+      <PageWrapper>
+        {recordProps.map((record, i) => {
+          return (
+            <DiaryRecord
+              key={i}
+              name={record.name}
+              language={record.language}
+              duration={record.duration}
+              date={record.date}
+              description={record.description}
+              rating={record.rating}
+            />
+          );
+        })}
+      </PageWrapper>
+    </div>
   );
 };
 

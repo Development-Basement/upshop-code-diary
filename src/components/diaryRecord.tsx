@@ -19,7 +19,7 @@ const DiaryRecord: FC<DiaryRecordProps> = ({
   rating,
 }) => {
   return (
-    <div className="h-fit p-5">
+    <div className="mt-2 h-fit bg-black bg-opacity-25 p-5 shadow-md">
       <div className="flex flex-row text-xl">
         <p className="text-3xl text-white">{name} -&#160;</p>
         <p className="mt-auto">
