@@ -47,8 +47,9 @@ const handler: NextApiHandler<HandlerOutput> = async (req, res) => {
   const caller = appRouter.createCaller(ctx);
 
   const { user_id } = req.query;
+
   try {
-    // get and validate user
+    // validate user
     if (
       typeof user_id !== "string" ||
       !(await caller.users.doesUserIdExist({ id: user_id }))
