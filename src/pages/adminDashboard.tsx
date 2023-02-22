@@ -1,8 +1,30 @@
 import { type NextPage } from "next";
+import { useState } from "react";
 import AdminHeader from "../components/adminHeader";
+import EditUser from "../components/editUser";
 import PageWrapper from "../components/pageWrapper";
+import ProfileDisplay from "../components/profileDisplay";
+
+type ProfileDisplayProps = {
+  name: string;
+  created: Date;
+};
 
 const AdminDashboard: NextPage = () => {
+  const [profiles, _setProfiles] = useState<ProfileDisplayProps[]>([
+    {
+      name: "Richard Materna",
+      created: new Date(),
+    },
+    {
+      name: "Adam Hrnčárek",
+      created: new Date(),
+    },
+    {
+      name: "Albert Pátík",
+      created: new Date(),
+    },
+  ]);
   return (
     <div className="h-full min-h-screen bg-gradient-to-b from-zinc-600 to-zinc-900">
       <AdminHeader />
@@ -19,6 +41,16 @@ const AdminDashboard: NextPage = () => {
           <h1 className="text-2xl">USER MANAGEMENT</h1>
           <button className="btn-primary btn mr-2 ml-auto">Add New User</button>
         </div>
+        <EditUser />
+        {profiles.map((profile, i) => {
+          return (
+            <ProfileDisplay
+              name={profile.name}
+              created={profile.created}
+              key={i}
+            />
+          );
+        })}
       </PageWrapper>
     </div>
   );
