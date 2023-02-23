@@ -12,7 +12,7 @@ import { dayts } from "../../../../../../utils/day";
  */
 type Duration = string;
 
-type ApiRecord = {
+export type ApiRecord = {
   id: string;
   date: string;
   "time-spent": Duration;
@@ -21,7 +21,7 @@ type ApiRecord = {
   description: string;
 };
 
-type PostInput = Omit<ApiRecord, "id">;
+type PostInput = Omit<ApiRecord, "id">; // or z.infer<typeof PostInputValidator>
 
 type HandlerOutput = Array<ApiRecord> | ApiRecord | undefined;
 
@@ -34,7 +34,7 @@ const PostInputValidator = z.object({
   description: z.string().min(1),
 });
 
-function diaryRecordToApiRecord(record: DiaryRecord) {
+export function diaryRecordToApiRecord(record: DiaryRecord) {
   return {
     id: record.id,
     date: dayts(record.date).format("YYYY-MM-DD"),
@@ -60,13 +60,12 @@ function postInputToDiaryRecord(record: PostInput) {
 }
 
 const handler: NextApiHandler<HandlerOutput> = async (req, res) => {
-  //* Get:
   // params: { user_id: string }
+  //* Get:
   // return: [ { id: string, date: string, time-spent: string, programming-language: string, rating: number, description: string } ]
   // status: 200 (OK)
   // status: 404 (User user_id Not Found)
   //* Post:
-  // params: { user_id: string }
   // body: { date: string, time-spent: string, programming-language: string, rating: number, description: string }
   // return: { id: string, date: string, time-spent: string, programming-language: string, rating: number, description: string }
   // status: 201 (Created)

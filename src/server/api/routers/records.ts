@@ -42,6 +42,56 @@ const extApiRouter = createTRPCRouter({
       });
       return record;
     }),
+  /**
+   * **ALWAYS** make sure userId is valid and record belongs to that user!!!
+   */
+  updateRecord: publicProcedure
+    .input(
+      z.object({
+        record: DiaryRecordParser,
+        userId: z.string().min(1),
+      }),
+    )
+    .output(DiaryRecordParser)
+    .mutation(async ({ ctx, input }) => {
+      const record = await ctx.prisma.record.update({
+        where: {
+          id: input.record.id,
+        },
+        data: {
+          ...input.record,
+        },
+        select: {
+          id: true,
+          date: true,
+          timeSpent: true,
+          programmingLanguage: true,
+          rating: true,
+          description: true,
+        },
+      });
+      return record;
+    }),
+  /**
+   * **ALWAYS** make sure userId is valid and record belongs to that user!!!
+   */
+  deleteRecord: publicProcedure
+    .input(
+      z.object({
+        recordId: z.string().min(1),
+        userId: z.string().min(1),
+      }),
+    )
+    .output(z.boolean())
+    .mutation(async ({ ctx, input }) => {
+      // throws if record doesn't exist
+      await ctx.prisma.record.delete({
+        where: {
+          id: input.recordId,
+        },
+      });
+      return true;
+    }),
 });
 
 export const recordsRouter = createTRPCRouter({
@@ -51,12 +101,6 @@ export const recordsRouter = createTRPCRouter({
       z.object({
         limit: z.number().min(1).max(100).default(20),
         offset: z.number().min(0).default(0),
-      }),
-    )
-    .output(
-      z.object({
-        records: z.array(DiaryRecordWithUserParser),
-        nextOffset: z.number().min(0),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -102,17 +146,86 @@ export const recordsRouter = createTRPCRouter({
       });
       return records;
     }),
+  doesRecordBelongToUser: publicProcedure
+    .input(
+      z.object({
+        recordId: z.string().min(1),
+        userId: z.string().min(1),
+      }),
+    )
+    .output(z.boolean())
+    .query(async ({ ctx, input }) => {
+      const record = await ctx.prisma.record.findUnique({
+        where: {
+          id: input.recordId,
+        },
+        select: {
+          userId: true,
+        },
+      });
+      return record?.userId === input.userId;
+    }),
+  getSignleRecord: publicProcedure
+    .input(z.object({ id: z.string().min(1) }))
+    .output(DiaryRecordParser.nullable())
+    .query(async ({ ctx, input }) => {
+      const record = await ctx.prisma.record.findUnique({
+        where: {
+          id: input.id,
+        },
+        select: {
+          id: true,
+          date: true,
+          timeSpent: true,
+          programmingLanguage: true,
+          rating: true,
+          description: true,
+        },
+      });
+      return record;
+    }),
   /**
-   * needs external validation
+   * needs external validation!!!
    */
   unsafe: extApiRouter,
   createRecord: protectedProcedure
     .input(DiaryRecordParser.omit({ id: true }))
-    .query(async ({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
       const record = await ctx.prisma.record.create({
         data: {
           ...input,
           userId: ctx.session.user.id,
+        },
+      });
+      return record;
+    }),
+  updateRecord: protectedProcedure
+    .input(DiaryRecordParser.partial())
+    .mutation(async ({ ctx, input }) => {
+      const record = await ctx.prisma.record.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          ...input,
+        },
+        select: {
+          id: true,
+          date: true,
+          timeSpent: true,
+          programmingLanguage: true,
+          rating: true,
+          description: true,
+        },
+      });
+      return record;
+    }),
+  deleteRecord: protectedProcedure
+    .input(z.object({ id: z.string().min(1) }))
+    .mutation(async ({ ctx, input }) => {
+      const record = await ctx.prisma.record.delete({
+        where: {
+          id: input.id,
         },
       });
       return record;
