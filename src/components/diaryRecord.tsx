@@ -1,6 +1,8 @@
 import type { FC } from "react";
 import Stars from "./stars";
 
+// FIXME: duration will be string
+// TODO: print durations and dates using day.js
 export type DiaryRecordProps = {
   name: string;
   language: string;
@@ -19,12 +21,12 @@ const DiaryRecord: FC<DiaryRecordProps> = ({
   rating,
 }) => {
   return (
-    <div className="mt-2 h-fit bg-black bg-opacity-25 p-5 shadow-md">
+    <div className="mt-2 h-fit bg-black/25 p-5 shadow-md">
       <div className="flex flex-row text-xl">
-        <p className="text-3xl text-white">{name} -&#160;</p>
+        <p className="text-3xl text-white">{name} -&nbsp;</p>
         <p className="mt-auto">
-          <span className="text-green-500">{language}</span> for
-          <span className="text-white">&#160;{duration} minutes</span>
+          <span className="text-action-500">{language}</span> for
+          <span className="text-white">&nbsp;{duration} minutes</span>
         </p>
       </div>
       <p className="mb-2">{date.toISOString()}</p>
