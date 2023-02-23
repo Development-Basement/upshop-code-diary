@@ -32,7 +32,7 @@ const Dashboard: NextPage = () => {
       date: new Date(2022, 3, 22),
       description:
         "Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet Lorem ipsum dolor sit amet",
-      rating: 2,
+      rating: 0,
     },
   ]);
 

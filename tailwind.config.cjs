@@ -4,7 +4,11 @@ const colors = require("tailwindcss/colors");
 module.exports = {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        action: colors.green,
+      },
+    },
   },
   plugins: [
     require("@tailwindcss/typography"),
@@ -16,7 +20,34 @@ module.exports = {
   darkMode: "class", // add "dark" class to parent element to enable dark mode
   daisyui: {
     // first theme is default -> light (so we can toggle it to dark later)
-    themes: ["light", "dark"], // TODO: change to custom themes with the same names
+    themes: [
+      {
+        light: {
+          primary: "#22c55e",
+          secondary: "#a855f7",
+          accent: "#2dd4bf",
+          neutral: "#525252",
+          "base-100": "#f4f4f5",
+          info: "#60a5fa",
+          success: "#34d399",
+          warning: "#facc15",
+          error: "#f87171",
+        },
+      },
+      {
+        dark: {
+          primary: "#22c55e",
+          secondary: "#a855f7",
+          accent: "#14b8a6",
+          neutral: "#27272a",
+          "base-100": "#3f3f46",
+          info: "#3b82f6",
+          success: "#34d399",
+          warning: "#eab308",
+          error: "#ef4444",
+        },
+      },
+    ], // TODO: change to custom themes with the same names
     darkTheme: "dark",
   },
 };
