@@ -1,9 +1,11 @@
 import { type NextPage } from "next";
 import { useState } from "react";
 import AdminHeader from "../components/adminHeader";
+import AreYouSure from "../components/areYouSure";
 import EditUser from "../components/editUser";
 import PageWrapper from "../components/pageWrapper";
 import ProfileDisplay from "../components/profileDisplay";
+import UploadBackup from "../components/uploadBackup";
 
 type ProfileDisplayProps = {
   name: string;
@@ -14,15 +16,15 @@ const AdminDashboard: NextPage = () => {
   const [profiles, _setProfiles] = useState<ProfileDisplayProps[]>([
     {
       name: "Richard Materna",
-      created: new Date(),
+      created: new Date("2022-3-25"),
     },
     {
       name: "Adam Hrnčárek",
-      created: new Date(),
+      created: new Date("2022-3-25"),
     },
     {
       name: "Albert Pátík",
-      created: new Date(),
+      created: new Date("2022-3-25"),
     },
   ]);
   return (
@@ -52,6 +54,8 @@ const AdminDashboard: NextPage = () => {
           );
         })}
       </PageWrapper>
+      <UploadBackup />
+      <AreYouSure />
     </div>
   );
 };
