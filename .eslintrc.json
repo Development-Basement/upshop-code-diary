@@ -22,7 +22,10 @@
     "prettier"
   ],
   "rules": {
-    "@typescript-eslint/consistent-type-imports": "warn",
+    "@typescript-eslint/consistent-type-imports": [
+      "warn",
+      { "fixStyle": "inline-type-imports" }
+    ],
     // manual overrides
     "quotes": ["error", "double"],
     "jsx-quotes": ["error", "prefer-double"],

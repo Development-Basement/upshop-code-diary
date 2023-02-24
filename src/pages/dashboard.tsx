@@ -1,7 +1,6 @@
 import { type NextPage } from "next";
 import { useState } from "react";
-import type { DiaryRecordProps } from "../components/diaryRecord";
-import DiaryRecord from "../components/diaryRecord";
+import DiaryRecord, { type DiaryRecordProps } from "../components/diaryRecord";
 import Header from "../components/header";
 import PageWrapper from "../components/pageWrapper";
 

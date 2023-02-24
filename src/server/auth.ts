@@ -1,11 +1,11 @@
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import type { GetServerSidePropsContext } from "next";
+import { type GetServerSidePropsContext } from "next";
 import {
   getServerSession,
   type DefaultSession,
   type NextAuthOptions,
 } from "next-auth";
-import type { DefaultJWT } from "next-auth/jwt";
+import { type DefaultJWT } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
 import { pbkdf2Sync } from "node:crypto";
 import { env } from "../env.mjs";
