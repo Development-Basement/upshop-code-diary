@@ -1,7 +1,7 @@
 import { type User } from "@prisma/client";
 import { randomBytes, scryptSync } from "node:crypto";
 import { z } from "zod";
-import { adminProcedure, createTRPCRouter } from "../trpc";
+import { adminProcedure, createTRPCRouter, publicProcedure } from "../trpc";
 
 function removeAuthData(user: User) {
   // @reason: we don't want to send the password hash and salt to the client
@@ -10,7 +10,7 @@ function removeAuthData(user: User) {
   return sanitizedUser;
 }
 
-export const authRouter = createTRPCRouter({
+export const usersRouter = createTRPCRouter({
   createUser: adminProcedure
     .input(
       z.object({
@@ -30,5 +30,31 @@ export const authRouter = createTRPCRouter({
         },
       });
       return removeAuthData(user);
+    }),
+  listUsers: publicProcedure.query(async ({ ctx }) => {
+    // ENHANCE: add pagination, this could crash the server
+    const users = await ctx.prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        isAdmin: true,
+      },
+    });
+    return users;
+  }),
+  doesUserIdExist: publicProcedure
+    .input(z.object({ id: z.string().min(1) }))
+    .output(z.boolean())
+    .query(async ({ ctx, input }) => {
+      const { id } = input;
+      const user = await ctx.prisma.user.findFirst({
+        where: {
+          id,
+        },
+        select: {
+          id: true,
+        },
+      });
+      return user !== null;
     }),
 });

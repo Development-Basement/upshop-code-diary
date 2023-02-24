@@ -14,17 +14,25 @@ datasource db {
   relationMode = "prisma"
 }
 
-model Example {
-  id        String   @id @default(cuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Record {
+  id                  String   @id @default(cuid())
+  date                DateTime @db.Date()
+  timeSpent           String // ISO 8601 duration @see https://en.wikipedia.org/wiki/ISO_8601#Durations
+  programmingLanguage String   @db.VarChar(30)
+  rating              Int      @db.UnsignedTinyInt
+  description         String   @db.Text
+  userId              String
+  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 // Necessary for Next auth
 model User {
-  id           String  @id @default(cuid())
-  name         String  @unique
-  passwordHash Bytes   @db.Binary(128)
-  salt         Bytes   @unique @db.Binary(16)
-  isAdmin      Boolean @default(false)
+  id           String   @id @default(cuid())
+  name         String   @unique
+  passwordHash Bytes    @db.Binary(128)
+  salt         Bytes    @unique @db.Binary(16)
+  isAdmin      Boolean  @default(false)
+  records      Record[]
 }
