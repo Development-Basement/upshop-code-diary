@@ -21,7 +21,7 @@ const Header: FC = () => {
   const router = useRouter();
 
   return (
-    <div className="sticky top-0 mb-2 flex w-full items-center bg-bg-dark-1 px-5 py-4 text-lg text-white shadow-thin-under-strong">
+    <div className="bg-bg-dark-1 sticky top-0 mb-2 flex w-full items-center px-5 py-4 text-lg text-white shadow-thin-under-strong">
       <Image src="/logoV3.png" alt="logo" width={40} height={40} className="" />
       <div className="ml-auto flex gap-8">
         {/* Admin links */}
@@ -42,20 +42,16 @@ const Header: FC = () => {
         {/* Action buttons */}
         <button className="">Create</button>
         <button
-          onClick={() => {
-            if (session) {
-              signOut()
-                .then(() => {
-                  router
-                    .push("/signin")
-                    .then(() => {})
-                    .catch(() => {});
-                })
-                .catch(() => {});
-            } else {
-              console.log("There is no session");
-            }
-          }}
+          onClick={
+            void (async () => {
+              if (session) {
+                await signOut();
+                await router.push("/signin");
+              } else {
+                console.log("There is no session");
+              }
+            })
+          }
           className=""
         >
           <FiLogOut />
