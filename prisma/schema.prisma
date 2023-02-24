@@ -16,7 +16,7 @@ datasource db {
 
 model Record {
   id                  String   @id @default(cuid())
-  date                DateTime
+  date                DateTime @db.Date()
   timeSpent           String // ISO 8601 duration @see https://en.wikipedia.org/wiki/ISO_8601#Durations
   programmingLanguage String   @db.VarChar(30)
   rating              Int      @db.UnsignedTinyInt

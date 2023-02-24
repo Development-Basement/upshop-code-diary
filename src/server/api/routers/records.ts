@@ -200,7 +200,7 @@ export const recordsRouter = createTRPCRouter({
       });
       return record?.userId === input.userId;
     }),
-  getSignleRecord: publicProcedure
+  getSingleRecord: publicProcedure
     .input(z.object({ id: z.string().min(1) }))
     .output(DiaryRecordParser.nullable())
     .query(async ({ ctx, input }) => {

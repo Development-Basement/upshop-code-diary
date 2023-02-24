@@ -34,10 +34,14 @@ const PostInputValidator = z.object({
   description: z.string().min(1),
 });
 
+export const timezoneOffset = new Date().getTimezoneOffset();
+
 export function diaryRecordToApiRecord(record: DiaryRecord) {
   return {
     id: record.id,
-    date: dayts(record.date).format("YYYY-MM-DD"),
+    date: dayts(record.date)
+      .add(timezoneOffset, "minutes")
+      .format("YYYY-MM-DD"),
     "time-spent": record.timeSpent,
     "programming-language": record.programmingLanguage,
     rating: record.rating,
@@ -50,8 +54,15 @@ function postInputToDiaryRecord(record: PostInput) {
   if (Number.isNaN(dura.asMilliseconds()) || dura.asMilliseconds() <= 0) {
     throw new Error("Invalid time-spent");
   }
+  let day = dayts(record.date, "YYYY-MM-DD", true);
+  if (!day.isValid()) {
+    throw new Error("Invalid date");
+  }
+  // javascript offsets Dates by the timezone offset,
+  // so we need to "add" it back in, otherwise it will get saved wrong
+  day = day.subtract(timezoneOffset, "minutes");
   return {
-    date: dayts(record.date, "YYYY-MM-DD", true).toDate(),
+    date: day.toDate(),
     timeSpent: dura.toISOString(), // technically not necessary?
     programmingLanguage: record["programming-language"],
     rating: record.rating,

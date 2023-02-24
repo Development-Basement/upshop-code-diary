@@ -3,7 +3,11 @@ import { z } from "zod";
 import { appRouter } from "../../../../../../server/api/root";
 import { createTRPCContext } from "../../../../../../server/api/trpc";
 import { dayts } from "../../../../../../utils/day";
-import { diaryRecordToApiRecord, type ApiRecord } from "./index";
+import {
+  diaryRecordToApiRecord,
+  timezoneOffset,
+  type ApiRecord,
+} from "./index";
 
 type HandlerOutput = ApiRecord | undefined;
 
@@ -23,9 +27,16 @@ function putInputToDiaryRecord(record: PutInput) {
   if (Number.isNaN(dura.asMilliseconds()) || dura.asMilliseconds() <= 0) {
     throw new Error("Invalid time-spent");
   }
+  let day = dayts(record.date, "YYYY-MM-DD", true);
+  if (!day.isValid()) {
+    throw new Error("Invalid date");
+  }
+  // javascript offsets Dates by the timezone offset,
+  // so we need to "add" it back in, otherwise it will get saved wrong
+  day = day.subtract(timezoneOffset, "minutes");
   return {
     id: record.id,
-    date: dayts(record.date, "YYYY-MM-DD", true).toDate(),
+    date: day.toDate(),
     timeSpent: dura.toISOString(), // technically not necessary?
     programmingLanguage: record["programming-language"],
     rating: record.rating,
@@ -74,7 +85,7 @@ const handler: NextApiHandler<HandlerOutput> = async (req, res) => {
       throw new Error("Invalid user_id or record_id");
     }
     if (method === "GET") {
-      const record = await caller.records.getSignleRecord({ id: record_id });
+      const record = await caller.records.getSingleRecord({ id: record_id });
       // record is never null
       if (record === null) throw new Error("Record not found");
       res.status(200).json(diaryRecordToApiRecord(record));
@@ -93,6 +104,7 @@ const handler: NextApiHandler<HandlerOutput> = async (req, res) => {
     const validated = PutInputValidator.parse(req.body);
     const input = putInputToDiaryRecord(validated);
     const record = await caller.records.unsafe.updateRecord({
+      id: record_id,
       record: input,
       userId: user_id,
     });
