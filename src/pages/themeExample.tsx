@@ -5,7 +5,7 @@ import { ThemeContext } from "../contexts/themeContext";
 const Home: NextPage = () => {
   const { theme, setTheme } = useContext(ThemeContext);
   return (
-    <div className="flex h-screen w-screen items-center justify-center bg-zinc-200 dark:bg-zinc-800">
+    <div className="flex h-screen w-screen items-center justify-center bg-zinc-200 dark:bg-bgdark2">
       <div className="flex flex-col gap-8">
         <p className="w-fit text-center text-2xl capitalize text-slate-700 dark:text-slate-200">
           Honestly quite{" "}
@@ -17,7 +17,7 @@ const Home: NextPage = () => {
             setTheme(theme === "dark" ? "light" : "dark");
           }}
         >
-          toggle theme
+          toggle theme``
         </button>
       </div>
     </div>

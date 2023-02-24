@@ -24,11 +24,11 @@ const EditUser: FC = () => {
   ]);
   return (
     <>
-      <div className="flex flex-row items-center bg-zinc-800 p-4">
+      <div className="flex flex-row items-center bg-bgdark2 p-4">
         <h1 className="text-2xl">USER MANAGEMENT</h1>
         <button className="btn-primary btn mr-2 ml-auto">Add New User</button>
       </div>
-      <div className="my-2 h-fit bg-black/25 p-5 shadow-md">
+      <div className="my-2 h-fit bg-tsbg1 p-5 shadow-thin-under-strong">
         <form className="flex w-full flex-col">
           <input
             type="username"
