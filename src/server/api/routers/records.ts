@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 
@@ -21,6 +22,8 @@ const DiaryRecordWithUserParser = DiaryRecordParser.extend({
 export type DiaryRecord = z.infer<typeof DiaryRecordParser>;
 export type DiaryRecordWithUser = z.infer<typeof DiaryRecordWithUserParser>;
 
+// ENHANCE: it could've been better to extract these into functions so we can use them in both the safe and unsafe routers
+// I didn't do it, because passing the whole context and input would be a bit messy
 const extApiRouter = createTRPCRouter({
   /**
    * **ALWAYS** make sure userId is valid!!!
@@ -33,7 +36,7 @@ const extApiRouter = createTRPCRouter({
       }),
     )
     .output(DiaryRecordParser)
-    .query(async ({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
       const record = await ctx.prisma.record.create({
         data: {
           ...input.record,
@@ -43,33 +46,57 @@ const extApiRouter = createTRPCRouter({
       return record;
     }),
   /**
-   * **ALWAYS** make sure userId is valid and record belongs to that user!!!
+   * **ALWAYS** make sure userId is valid!!!
    */
   updateRecord: publicProcedure
     .input(
       z.object({
+        id: z.string().min(1),
         record: DiaryRecordParser,
         userId: z.string().min(1),
       }),
     )
     .output(DiaryRecordParser)
     .mutation(async ({ ctx, input }) => {
-      const record = await ctx.prisma.record.update({
+      const response = await ctx.prisma.user.update({
         where: {
-          id: input.record.id,
+          id: input.userId,
         },
         data: {
-          ...input.record,
+          records: {
+            update: {
+              where: {
+                id: input.id,
+              },
+              data: {
+                ...input.record,
+              },
+            },
+          },
         },
         select: {
-          id: true,
-          date: true,
-          timeSpent: true,
-          programmingLanguage: true,
-          rating: true,
-          description: true,
+          records: {
+            where: {
+              id: input.record.id,
+            },
+            select: {
+              id: true,
+              date: true,
+              timeSpent: true,
+              programmingLanguage: true,
+              rating: true,
+              description: true,
+            },
+          },
         },
       });
+      const record = response.records[0];
+      if (!record) {
+        throw new TRPCError({
+          message: "Record not found",
+          code: "NOT_FOUND",
+        });
+      }
       return record;
     }),
   /**
@@ -85,11 +112,19 @@ const extApiRouter = createTRPCRouter({
     .output(z.boolean())
     .mutation(async ({ ctx, input }) => {
       // throws if record doesn't exist
-      await ctx.prisma.record.delete({
+      const response = await ctx.prisma.record.deleteMany({
         where: {
+          userId: input.userId,
           id: input.recordId,
         },
       });
+      if (response.count === 0) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+      if (response.count > 1) {
+        console.error("deleted more than one record", response);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      }
       return true;
     }),
 });
@@ -184,30 +219,14 @@ export const recordsRouter = createTRPCRouter({
       });
       return record;
     }),
-  /**
-   * needs external validation!!!
-   */
-  unsafe: extApiRouter,
   createRecord: protectedProcedure
     .input(DiaryRecordParser.omit({ id: true }))
+    .output(DiaryRecordWithUserParser)
     .mutation(async ({ ctx, input }) => {
       const record = await ctx.prisma.record.create({
         data: {
           ...input,
           userId: ctx.session.user.id,
-        },
-      });
-      return record;
-    }),
-  updateRecord: protectedProcedure
-    .input(DiaryRecordParser.partial())
-    .mutation(async ({ ctx, input }) => {
-      const record = await ctx.prisma.record.update({
-        where: {
-          id: input.id,
-        },
-        data: {
-          ...input,
         },
         select: {
           id: true,
@@ -216,18 +235,80 @@ export const recordsRouter = createTRPCRouter({
           programmingLanguage: true,
           rating: true,
           description: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              isAdmin: true,
+            },
+          },
         },
       });
+      return record;
+    }),
+  updateRecord: protectedProcedure
+    .input(
+      z.object({ id: z.string().min(1), record: DiaryRecordParser.partial() }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const response = await ctx.prisma.user.update({
+        where: {
+          id: ctx.session.user.id,
+        },
+        data: {
+          records: {
+            update: {
+              where: {
+                id: input.id,
+              },
+              data: {
+                ...input.record,
+              },
+            },
+          },
+        },
+        select: {
+          records: {
+            where: {
+              id: input.record.id ?? input.id,
+            },
+            select: {
+              id: true,
+              date: true,
+              timeSpent: true,
+              programmingLanguage: true,
+              rating: true,
+              description: true,
+            },
+          },
+        },
+      });
+      const record = response.records[0];
+      if (!record) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
       return record;
     }),
   deleteRecord: protectedProcedure
     .input(z.object({ id: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
-      const record = await ctx.prisma.record.delete({
+      const response = await ctx.prisma.record.deleteMany({
         where: {
+          userId: ctx.session.user.id,
           id: input.id,
         },
       });
-      return record;
+      if (response.count === 0) {
+        throw new TRPCError({ code: "NOT_FOUND" });
+      }
+      if (response.count > 1) {
+        console.error("deleted more than one record", response);
+        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+      }
+      return true;
     }),
+  /**
+   * needs external validation!!!
+   */
+  unsafe: extApiRouter,
 });
