@@ -33,6 +33,7 @@ module.exports = {
     themes: [
       {
         light: {
+          // TODO: actually finish light theme
           primary: "#22c55e",
           secondary: "#a855f7",
           accent: "#2dd4bf",
@@ -57,7 +58,7 @@ module.exports = {
           error: "#ef4444",
         },
       },
-    ], // TODO: change to custom themes with the same names
+    ],
     darkTheme: "dark",
   },
 };

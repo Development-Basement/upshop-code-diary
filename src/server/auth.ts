@@ -7,7 +7,7 @@ import {
 } from "next-auth";
 import type { DefaultJWT } from "next-auth/jwt";
 import Credentials from "next-auth/providers/credentials";
-import { scryptSync } from "node:crypto";
+import { pbkdf2Sync } from "node:crypto";
 import { env } from "../env.mjs";
 import { prisma } from "./db";
 
@@ -85,7 +85,7 @@ export const authOptions: NextAuthOptions = {
         },
         password: {
           label: "Password",
-          type: "text",
+          type: "password",
         },
       },
       /**
@@ -111,10 +111,12 @@ export const authOptions: NextAuthOptions = {
           passwordHash: Buffer.from("timing attack mitigation"),
           id: undefined,
         };
-        const providedPasswordHash = scryptSync(
+        const providedPasswordHash = pbkdf2Sync(
           credentials.password,
           salt,
-          128,
+          210000,
+          64,
+          "sha512",
         );
         if (
           providedPasswordHash.compare(passwordHash) !== 0 ||

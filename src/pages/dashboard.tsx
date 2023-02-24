@@ -6,7 +6,7 @@ import Header from "../components/header";
 import PageWrapper from "../components/pageWrapper";
 
 const Dashboard: NextPage = () => {
-  const [recordProps, _setRecordProps] = useState<DiaryRecordProps[]>([
+  const [recordProps, _setRecordProps] = useState<Array<DiaryRecordProps>>([
     {
       name: "Albert Pátík",
       language: "C#",

@@ -2,9 +2,11 @@ import { type NextPage } from "next";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
+import { api } from "../utils/api";
 
 const Home: NextPage = () => {
   // this page still exists, because it is the only way to log in currently
+  const { mutate: createUser } = api.users.createUser.useMutation();
   return (
     <>
       <Head>
@@ -43,6 +45,12 @@ const Home: NextPage = () => {
           </div>
           <div className="flex flex-col items-center gap-2">
             <AuthShowcase />
+            <button
+              className="btn-primary btn mt-4"
+              onClick={() => createUser({ name: "admin", password: "123456" })}
+            >
+              Create admin user
+            </button>
           </div>
         </div>
       </main>
