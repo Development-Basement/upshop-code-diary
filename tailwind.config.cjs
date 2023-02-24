@@ -7,6 +7,11 @@ module.exports = {
     extend: {
       colors: {
         action: colors.green,
+        "bg-dark-1": colors.zinc[600],
+        "bg-dark-2": colors.zinc[900],
+      },
+      boxShadow: {
+        "thin-under-strong": "0 0px 4px 4px rgba(0,0,0,0.25)",
       },
     },
   },

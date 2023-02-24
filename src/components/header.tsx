@@ -1,22 +1,65 @@
-import { useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import type { FC } from "react";
-import logo from "../../public/LogoV3.png";
+import { FiLogOut } from "react-icons/fi";
 
 const Header: FC = () => {
-  // TODO: add admin links if the user is an admin
   const { data: session } = useSession();
   const isAdmin = session?.user.isAdmin ?? false;
 
+  //Idk, it's not really neccesary to do it this way for few link like this but doesn't hurt either...
+  const unprotectedLinks = {
+    Dashboard: "/",
+  };
+
+  const adminProtectedLinks = {
+    "Admin Dashboard": "/adminDashboard",
+  };
+
+  const router = useRouter();
+
   return (
-    <div className="sticky top-0 mb-2 flex h-16 w-full items-center bg-zinc-600 px-3 text-lg text-white shadow-lg">
-      <Image src={logo} alt="logo" width={40} className="" />
+    <div className="sticky top-0 mb-2 flex w-full items-center bg-bg-dark-1 px-5 py-4 text-lg text-white shadow-thin-under-strong">
+      <Image src="/logoV3.png" alt="logo" width={40} height={40} className="" />
       <div className="ml-auto flex gap-8">
-        {/* These should be links, probably with h-full, so they can be selected easier? */}
-        <button className="">Dashboard</button>
-        {/* create is an action, maybe make it different? */}
+        {/* Admin links */}
+        {isAdmin &&
+          Object.entries(adminProtectedLinks).map((link) => (
+            <Link key={link[0]} href={link[1]}>
+              {link[0]}
+            </Link>
+          ))}
+
+        {/* General links */}
+        {Object.entries(unprotectedLinks).map((link) => (
+          <Link key={link[0]} href={link[1]}>
+            {link[0]}
+          </Link>
+        ))}
+
+        {/* Action buttons */}
         <button className="">Create</button>
-        <button className=""></button>
+        <button
+          onClick={() => {
+            if (session) {
+              signOut()
+                .then(() => {
+                  router
+                    .push("/signin")
+                    .then(() => {})
+                    .catch(() => {});
+                })
+                .catch(() => {});
+            } else {
+              console.log("There is no session");
+            }
+          }}
+          className=""
+        >
+          <FiLogOut />
+        </button>
       </div>
     </div>
   );
