@@ -57,7 +57,7 @@ export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt" },
   debug: env.NODE_ENV === "development",
   pages: {
-    // TODO: add custom pages here
+    signIn: "/signin",
   },
   callbacks: {
     session({ session, token }) {
