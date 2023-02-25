@@ -1,5 +1,4 @@
-import type { FC } from "react";
-import { useState } from "react";
+import { useState, type FC } from "react";
 import ProfileDisplay from "./profileDisplay";
 
 type ProfileDisplayProps = {
@@ -8,7 +7,7 @@ type ProfileDisplayProps = {
 };
 
 const EditUser: FC = () => {
-  const [profiles, _setProfiles] = useState<ProfileDisplayProps[]>([
+  const [profiles, _setProfiles] = useState<Array<ProfileDisplayProps>>([
     {
       name: "Richard Materna",
       created: new Date("2022-3-25"),

@@ -1,4 +1,4 @@
-import type { FC } from "react";
+import { type FC } from "react";
 import { MdEdit } from "react-icons/md";
 
 export type ProfileDisplayProps = {
