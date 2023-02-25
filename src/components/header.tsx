@@ -41,19 +41,7 @@ const Header: FC = () => {
 
         {/* Action buttons */}
         <button className="">Create</button>
-        <button
-          onClick={
-            void (async () => {
-              if (session) {
-                await signOut();
-                await router.push("/signin");
-              } else {
-                console.log("There is no session");
-              }
-            })
-          }
-          className=""
-        >
+        <button onClick={() => void signOut()} className="">
           <FiLogOut />
         </button>
       </div>
