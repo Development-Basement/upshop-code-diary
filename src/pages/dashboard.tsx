@@ -1,12 +1,11 @@
 import { type NextPage } from "next";
 import { useState } from "react";
-import type { DiaryRecordProps } from "../components/diaryRecord";
-import DiaryRecord from "../components/diaryRecord";
+import DiaryRecord, { type DiaryRecordProps } from "../components/diaryRecord";
 import Header from "../components/header";
 import PageWrapper from "../components/pageWrapper";
 
 const Dashboard: NextPage = () => {
-  const [recordProps, _setRecordProps] = useState<DiaryRecordProps[]>([
+  const [recordProps, _setRecordProps] = useState<Array<DiaryRecordProps>>([
     {
       name: "Albert Pátík",
       language: "C#",

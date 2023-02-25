@@ -1,4 +1,4 @@
-import type { FC } from "react";
+import { type FC } from "react";
 import Stars from "./stars";
 
 // FIXME: duration will be string

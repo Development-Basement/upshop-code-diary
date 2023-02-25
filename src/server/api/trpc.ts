@@ -113,7 +113,6 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
   });
 });
 
-// ENHANCE: use chaining instead
 const enforceUserIsAdmin = t.middleware(({ ctx, next }) => {
   if (!ctx.session?.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
