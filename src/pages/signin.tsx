@@ -13,30 +13,26 @@ const Dashboard: NextPage = () => {
 
   const router = useRouter();
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // the void (async () => {}) just doesn't work for me... Anywhere I put it, it does nothing...
-    signIn("credentials", {
-      redirect: false,
-      password: passwordRef.current?.value,
-      username: usernameRef.current?.value,
-    })
-      .then((res) => {
-        if (res?.ok) {
-          // void ( async () => await router.push("/") ) was not working, I don't know why...
-          router.push("/").catch(() => {});
-        } else {
-          setError("user not found, double check your credentials");
-          if (usernameRef.current) {
-            usernameRef.current.value = "";
-          }
-          if (passwordRef.current) {
-            passwordRef.current.value = "";
-          }
-        }
-      })
-      .catch(() => {});
+    try {
+      const res = await signIn("credentials", {
+        redirect: false,
+        password: passwordRef.current?.value,
+        username: usernameRef.current?.value,
+      });
+      if (res?.ok) {
+        await router.push("/");
+        return;
+      }
+    } catch (err) {
+      console.error(err);
+    }
+    setError("Invalid credentials!");
+    if (passwordRef.current) {
+      passwordRef.current.value = "";
+    }
   };
 
   return (
@@ -46,7 +42,9 @@ const Dashboard: NextPage = () => {
         <p className="mb-5 text-sm">keep track of your coding progress</p>
         <form
           className="flex w-72 flex-col gap-2"
-          onSubmit={(e) => handleSubmit(e)}
+          onSubmit={(e) => {
+            void handleSubmit(e);
+          }}
         >
           <input
             ref={usernameRef}
@@ -60,11 +58,12 @@ const Dashboard: NextPage = () => {
             placeholder="password"
             className="input-bordered input-primary input w-full max-w-xs"
           />
+          {/* TODO: add cross to setError back to "" (hide it) */}
+          {error && <div className="alert alert-error rounded-md">{error}</div>}
           <button type="submit" className="btn-primary btn mt-2">
             Login
           </button>
         </form>
-        {error}
       </div>
     </div>
   );
