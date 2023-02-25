@@ -1,12 +1,17 @@
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { type FC } from "react";
+import { useRouter } from "next/router";
+import { useState, type FC } from "react";
 import { FiLogOut } from "react-icons/fi";
 
 const Header: FC = () => {
   const { data: session } = useSession();
   const isAdmin = session?.user.isAdmin ?? false;
+
+  const router = useRouter();
+
+  const [submitDisabled, setSubmitDisabled] = useState(false);
 
   //Idk, it's not really neccesary to do it this way for few link like this but doesn't hurt either...
   const unprotectedLinks = {
@@ -38,7 +43,17 @@ const Header: FC = () => {
 
         {/* Action buttons */}
         <button className="">Create</button>
-        <button onClick={() => void signOut()} className="">
+        <button
+        disabled={submitDisabled}
+          onClick={() =>
+            void (async () => {
+              setSubmitDisabled(true);
+              await signOut({ redirect: false });
+              await router.push("/signin");
+            })
+          }
+          className=""
+        >
           <FiLogOut />
         </button>
       </div>
