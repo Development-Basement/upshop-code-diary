@@ -11,9 +11,9 @@ const Header: FC = () => {
 
   const router = useRouter();
 
-  const [submitDisabled, setSubmitDisabled] = useState(false);
+  const [signOutDisabled, setSignOutDisabled] = useState(false);
 
-  //Idk, it's not really neccesary to do it this way for few link like this but doesn't hurt either...
+  // Idk, it's not really neccesary to do it this way for a few links, but doesn't hurt either...
   const unprotectedLinks = {
     Dashboard: "/",
   };
@@ -22,37 +22,39 @@ const Header: FC = () => {
     Admin: "/admin",
   };
 
+  const handleSignOut = async () => {
+    setSignOutDisabled(true);
+    await signOut({ redirect: false });
+    await router.push("/signin");
+    setSignOutDisabled(false);
+  };
+
   return (
-    <div className="sticky top-0 mb-2 flex w-full items-center bg-bgdark1 px-5 py-4 text-lg text-white shadow-thin-under-strong">
+    <div className="sticky top-0 mb-2 flex h-20 w-full items-center bg-bgdark1 px-5 text-lg text-white shadow-thin-under-strong">
       <Image src="/logoV3.png" alt="logo" width={40} height={40} className="" />
       <div className="ml-auto flex gap-8">
         {/* Admin links */}
         {isAdmin &&
           Object.entries(adminProtectedLinks).map((link) => (
-            <Link key={link[0]} href={link[1]}>
+            <Link key={link[0]} href={link[1]} className="link no-underline">
               {link[0]}
             </Link>
           ))}
 
         {/* General links */}
         {Object.entries(unprotectedLinks).map((link) => (
-          <Link key={link[0]} href={link[1]}>
+          <Link key={link[0]} href={link[1]} className="link no-underline">
             {link[0]}
           </Link>
         ))}
 
         {/* Action buttons */}
-        <button className="">Create</button>
+        <button className="link-primary link no-underline">Create</button>
         <button
-        disabled={submitDisabled}
-          onClick={() =>
-            void (async () => {
-              setSubmitDisabled(true);
-              await signOut({ redirect: false });
-              await router.push("/signin");
-            })
-          }
-          className=""
+          disabled={signOutDisabled}
+          onClick={() => void handleSignOut()}
+          title="Sign out"
+          className="text-red-500 outline-2 outline-offset-2 outline-current hover:text-red-700 focus:outline disabled:text-gray-500"
         >
           <FiLogOut />
         </button>
