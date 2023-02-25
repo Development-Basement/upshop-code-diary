@@ -1,23 +1,42 @@
 import { type NextPage } from "next";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
-import { FormEvent } from "react";
+import { useRouter } from "next/router";
+import { useRef, useState, type FormEvent } from "react";
 import textLogo from "../../public/textLogo.png";
 
 const Dashboard: NextPage = () => {
+  const usernameRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
+
+  const [error, setError] = useState("");
+
+  const router = useRouter();
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    signIn("Credentials", {
+    // the void (async () => {}) just doesn't work for me... Anywhere I put it, it does nothing...
+    signIn("credentials", {
       redirect: false,
-      callbackUrl: "/",
-      password: "123456",
-      username: "admin",
+      password: passwordRef.current?.value,
+      username: usernameRef.current?.value,
     })
-      .then(() => {})
+      .then((res) => {
+        if (res?.ok) {
+          // void ( async () => await router.push("/") ) was not working, I don't know why...
+          router.push("/").catch(() => {});
+        } else {
+          setError("user not found, double check your credentials");
+          if (usernameRef.current) {
+            usernameRef.current.value = "";
+          }
+          if (passwordRef.current) {
+            passwordRef.current.value = "";
+          }
+        }
+      })
       .catch(() => {});
-
-    console.log("dfguidsgisryug");
   };
 
   return (
@@ -30,11 +49,13 @@ const Dashboard: NextPage = () => {
           onSubmit={(e) => handleSubmit(e)}
         >
           <input
+            ref={usernameRef}
             type="text"
             placeholder="username"
             className="input-bordered input-primary input w-full max-w-xs"
           />
           <input
+            ref={passwordRef}
             type="password"
             placeholder="password"
             className="input-bordered input-primary input w-full max-w-xs"
@@ -43,6 +64,7 @@ const Dashboard: NextPage = () => {
             Login
           </button>
         </form>
+        {error}
       </div>
     </div>
   );
