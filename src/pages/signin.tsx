@@ -4,7 +4,7 @@ import textLogo from "../../public/textLogo.png";
 
 const Dashboard: NextPage = () => {
   return (
-    <div className="h-full min-h-screen bg-gradient-to-b from-zinc-600 to-zinc-900">
+    <div className="h-full min-h-screen bg-gradient-to-b from-bgdark1 to-bgdark3">
       <div className="mx-auto flex h-screen w-2/5 min-w-[38rem] flex-col items-center justify-center">
         <Image src={textLogo} alt="textLogo" width={300} />
         <p className="mb-5 text-sm">keep track of your coding progress</p>
