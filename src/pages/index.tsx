@@ -2,11 +2,8 @@ import { type NextPage } from "next";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import Link from "next/link";
-import { api } from "../utils/api";
 
 const Home: NextPage = () => {
-  // this page still exists, because it is the only way to log in currently
-  const { mutate: createUser } = api.users.createUser.useMutation();
   return (
     <>
       <Head>
