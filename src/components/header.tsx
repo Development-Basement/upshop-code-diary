@@ -1,7 +1,6 @@
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { type FC } from "react";
 import { FiLogOut } from "react-icons/fi";
 
@@ -15,10 +14,8 @@ const Header: FC = () => {
   };
 
   const adminProtectedLinks = {
-    "Admin Dashboard": "/adminDashboard",
+    Admin: "/admin",
   };
-
-  const router = useRouter();
 
   return (
     <div className="sticky top-0 mb-2 flex w-full items-center bg-bgdark1 px-5 py-4 text-lg text-white shadow-thin-under-strong">
