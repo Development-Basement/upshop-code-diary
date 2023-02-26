@@ -30,7 +30,7 @@ const Header: FC = () => {
   };
 
   return (
-    <div className="sticky top-0 mb-2 flex h-20 w-full items-center bg-bgdark1 px-5 text-lg text-white shadow-thin-under-strong">
+    <div className="sticky top-0 flex w-full items-center bg-bgdark1 px-5 py-4 text-lg text-white shadow-thin-under-strong">
       <Image src="/logoV3.png" alt="logo" width={40} height={40} className="" />
       <div className="ml-auto flex gap-8">
         {/* Admin links */}

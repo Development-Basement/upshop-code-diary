@@ -26,6 +26,7 @@ module.exports = {
     // @ts-expect-error // daisyui is not typed :(
     require("daisyui"),
     require("@headlessui/tailwindcss"),
+    require("tailwind-scrollbar")({ nocompatible: true }),
   ],
   darkMode: "class", // add "dark" class to parent element to enable dark mode
   daisyui: {

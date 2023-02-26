@@ -34,5 +34,6 @@ model User {
   passwordHash Bytes    @db.Binary(64)
   salt         Bytes    @unique @db.Binary(8)
   isAdmin      Boolean  @default(false)
+  createdAt    DateTime @default(now())
   records      Record[]
 }
