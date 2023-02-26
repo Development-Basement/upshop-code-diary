@@ -4,12 +4,13 @@ import { z } from "zod";
 import { prisma } from "../../db";
 import { adminProcedure, createTRPCRouter, publicProcedure } from "../trpc";
 
-const nameSchema = z.string().regex(/^[a-zA-Z0-9-_]{3,15}$/); // 3-15 chars, letters, numbers, - and _
+const usernameSchema = z.string().regex(/^[a-zA-Z0-9-_]{3,15}$/); // 3-15 chars, letters, numbers, - and _
+const passwordSchema = z.string().min(6).regex(/^\S*$/); // no whitespace
 
 // strips auth data from the user
 const userSchema = z.object({
   id: z.string().min(1),
-  name: nameSchema,
+  name: usernameSchema,
   isAdmin: z.boolean(),
   createdAt: z.date(),
 });
@@ -67,8 +68,8 @@ export const usersRouter = createTRPCRouter({
   createUser: adminProcedure
     .input(
       z.object({
-        username: nameSchema,
-        password: z.string().min(6).regex(/^\S*$/), // no whitespace
+        username: usernameSchema,
+        password: passwordSchema,
       }),
     )
     .output(userSchema)
@@ -100,18 +101,93 @@ export const usersRouter = createTRPCRouter({
         salt = randomBytes(8);
         iterCount++;
       } while (await doesSaltExist(salt));
-      const passwordHash = pbkdf2Sync(
-        input.password,
-        salt,
-        210000,
-        64,
-        "sha512",
-      );
+      const passwordHash = hashPassword(input.password, salt);
       const user = await ctx.prisma.user.create({
         data: {
           name: input.username,
           passwordHash,
           salt,
+        },
+      });
+      return user;
+    }),
+  changePassword: adminProcedure
+    .input(
+      z.object({
+        userId: z.string().min(1),
+        newPassword: passwordSchema,
+      }),
+    )
+    .output(z.boolean())
+    .mutation(async ({ input, ctx }) => {
+      const user = await ctx.prisma.user.findFirst({
+        where: {
+          id: input.userId,
+        },
+        select: {
+          id: true,
+          salt: true,
+        },
+      });
+      if (user === null) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "User not found",
+        });
+      }
+      const passwordHash = hashPassword(input.newPassword, user.salt);
+      await ctx.prisma.user.update({
+        where: {
+          id: input.userId,
+        },
+        data: {
+          passwordHash,
+        },
+      });
+      return true;
+    }),
+  /** WILL error if the user already has this username */
+  changeUsername: adminProcedure
+    .input(
+      z.object({
+        userId: z.string().min(1),
+        newUsername: usernameSchema,
+      }),
+    )
+    .output(z.boolean())
+    .mutation(async ({ input, ctx }) => {
+      if (await doesUsernameExist(input.newUsername)) {
+        throw new TRPCError({
+          code: "CONFLICT",
+          message: "Username already exists",
+        });
+      }
+      await ctx.prisma.user.update({
+        where: {
+          id: input.userId,
+        },
+        data: {
+          name: input.newUsername,
+        },
+        select: {
+          id: true,
+        },
+      });
+      return true;
+    }),
+  deleteUser: adminProcedure
+    .input(z.object({ userId: z.string().min(1) }))
+    .output(userSchema)
+    .mutation(async ({ input, ctx }) => {
+      const user = await ctx.prisma.user.delete({
+        where: {
+          id: input.userId,
+        },
+        select: {
+          id: true,
+          name: true,
+          isAdmin: true,
+          createdAt: true,
         },
       });
       return user;
@@ -140,4 +216,8 @@ async function doesSaltExist(salt: Buffer) {
     },
   });
   return response.length > 0;
+}
+
+function hashPassword(password: string, salt: Buffer) {
+  return pbkdf2Sync(password, salt, 210000, 64, "sha512");
 }
