@@ -2,7 +2,7 @@ import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect, useState, type FC } from "react";
+import { useState, type FC } from "react";
 import { FiLogOut } from "react-icons/fi";
 
 const Header: FC = () => {
@@ -22,13 +22,7 @@ const Header: FC = () => {
     Admin: "/admin",
   };
 
-  const [currentURL, setCurrentURL] = useState<string>("/");
-
-  useEffect(() => {
-    if (currentURL != router.asPath) {
-      setCurrentURL(router.asPath);
-    }
-  }, [router.asPath, currentURL]);
+  const currentURL = router.asPath;
 
   const handleSignOut = async () => {
     setSignOutDisabled(true);
