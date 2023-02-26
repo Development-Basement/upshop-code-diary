@@ -319,7 +319,7 @@ export const EditUserForm: FC<EditUserFormProps> = ({
           </div>
           {(passwordErrors.password ||
             passwordErrors.confirmPassword ||
-            usernameError) && (
+            passwordError) && (
             <div className="mt-1 flex flex-col gap-2 text-error">
               {passwordErrors.password && (
                 <p>
@@ -330,9 +330,9 @@ export const EditUserForm: FC<EditUserFormProps> = ({
               {passwordErrors.confirmPassword && (
                 <p>Passwords don&apos;t match! Please try again.</p>
               )}
-              {usernameError && (
+              {passwordError && (
                 <p>
-                  There was an error chaning username: {usernameError.message}
+                  There was an error chaning username: {passwordError.message}
                 </p>
               )}
             </div>
@@ -384,6 +384,12 @@ export const EditUserForm: FC<EditUserFormProps> = ({
                 <p className="text-sm text-neutral-content">
                   This action is permament and cannot be undone.
                 </p>
+                {deletionError && (
+                  <p className="mt-2 text-sm text-error">
+                    There was an error deleting the user:{" "}
+                    {deletionError.message}
+                  </p>
+                )}
               </div>
               <div className="flex place-content-between">
                 <button
