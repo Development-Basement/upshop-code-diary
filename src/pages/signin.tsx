@@ -1,5 +1,6 @@
 import { type NextPage } from "next";
 import { signIn } from "next-auth/react";
+import Head from "next/head";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useRef, useState, type FormEvent } from "react";
@@ -38,6 +39,9 @@ const Dashboard: NextPage = () => {
 
   return (
     <PageWrapper showHeader={false}>
+      <Head>
+        <title>UpShop - Sign in</title>
+      </Head>
       <div className="mx-auto flex h-screen w-2/5 min-w-[38rem] flex-col items-center justify-center">
         <Image src={textLogo} alt="textLogo" width={300} />
         <p className="mb-5 text-sm">keep track of your coding progress</p>

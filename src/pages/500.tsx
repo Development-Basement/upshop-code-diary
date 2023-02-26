@@ -1,10 +1,14 @@
 import { NextPage } from "next";
+import Head from "next/head";
 import Link from "next/link";
 import PageWrapper from "../components/pageWrapper";
 
 const custom500: NextPage = () => {
   return (
     <PageWrapper showHeader={false}>
+      <Head>
+        <title>Oops - 500</title>
+      </Head>
       <main className="flex w-1/2 flex-col items-center justify-center gap-8 pb-14">
         <span className="flex flex-col items-center justify-center">
           <span className="text-[8rem] font-bold text-white">500</span>

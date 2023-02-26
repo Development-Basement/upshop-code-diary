@@ -1,6 +1,6 @@
 import { type GetServerSidePropsContext, type NextPage } from "next";
+import Head from "next/head";
 import DbManagement from "../components/dbManagement";
-import Header from "../components/header";
 import ManageUsers from "../components/manageUsers";
 import PageWrapper from "../components/pageWrapper";
 import { getServerAuthSession } from "../server/auth";
@@ -8,11 +8,14 @@ import { getServerAuthSession } from "../server/auth";
 const AdminDashboard: NextPage = () => {
   return (
     <PageWrapper showHeader={true}>
+      <Head>
+        <title>UpShop - Admin</title>
+      </Head>
       <div className="h-full w-full">
         <DbManagement />
         <ManageUsers />
-      </PageWrapper>
-    </div>
+      </div>
+    </PageWrapper>
   );
 };
 
