@@ -11,20 +11,44 @@ const userSchema = z.object({
   id: z.string().min(1),
   name: nameSchema,
   isAdmin: z.boolean(),
+  createdAt: z.date(),
 });
 
 export const usersRouter = createTRPCRouter({
-  listUsers: publicProcedure.query(async ({ ctx }) => {
-    // ENHANCE: add pagination, this could crash the server
-    const users = await ctx.prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        isAdmin: true,
-      },
-    });
-    return users;
-  }),
+  listUsers: publicProcedure
+    .input(
+      z.object({
+        limit: z.number().min(1).max(100).default(50),
+        cursor: z.string().min(1).optional(),
+      }),
+    )
+    .output(
+      z.object({
+        items: z.array(userSchema),
+        nextCursor: z.string().min(1).optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const users = await ctx.prisma.user.findMany({
+        select: {
+          id: true,
+          name: true,
+          isAdmin: true,
+          createdAt: true,
+        },
+        orderBy: {
+          name: "asc",
+        },
+        take: input.limit + 1,
+        cursor: input.cursor ? { id: input.cursor } : undefined,
+      });
+      let nextCursor: string | undefined = undefined;
+      if (users.length > input.limit) {
+        const nextItem = users.pop();
+        nextCursor = nextItem!.id;
+      }
+      return { items: users, nextCursor };
+    }),
   doesUserIdExist: publicProcedure
     .input(z.object({ id: z.string().min(1) }))
     .output(z.boolean())
@@ -43,13 +67,13 @@ export const usersRouter = createTRPCRouter({
   createUser: adminProcedure
     .input(
       z.object({
-        name: nameSchema,
+        username: nameSchema,
         password: z.string().min(6).regex(/^\S*$/), // no whitespace
       }),
     )
     .output(userSchema)
     .mutation(async ({ input, ctx }) => {
-      if (await doesUsernameExist(input.name)) {
+      if (await doesUsernameExist(input.username)) {
         throw new TRPCError({
           code: "CONFLICT",
           message: "Username already exists",
@@ -85,7 +109,7 @@ export const usersRouter = createTRPCRouter({
       );
       const user = await ctx.prisma.user.create({
         data: {
-          name: input.name,
+          name: input.username,
           passwordHash,
           salt,
         },
