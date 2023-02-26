@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useRef, useState, type FormEvent } from "react";
 import textLogo from "../../public/textLogo.png";
+import PageWrapper from "../components/pageWrapper";
 
 const Dashboard: NextPage = () => {
   const usernameRef = useRef<HTMLInputElement>(null);
@@ -36,7 +37,7 @@ const Dashboard: NextPage = () => {
   };
 
   return (
-    <div className="h-full min-h-screen bg-gradient-to-b from-bgdark1 to-bgdark3">
+    <PageWrapper showHeader={false}>
       <div className="mx-auto flex h-screen w-2/5 min-w-[38rem] flex-col items-center justify-center">
         <Image src={textLogo} alt="textLogo" width={300} />
         <p className="mb-5 text-sm">keep track of your coding progress</p>
@@ -65,7 +66,7 @@ const Dashboard: NextPage = () => {
           </button>
         </form>
       </div>
-    </div>
+    </PageWrapper>
   );
 };
 

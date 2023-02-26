@@ -20,9 +20,13 @@ const EditUser: FC = () => {
       name: "Albert Pátík",
       created: new Date("2022-3-25"),
     },
+    {
+      name: "Albert Pátík",
+      created: new Date("2022-3-25"),
+    },
   ]);
   return (
-    <>
+    <main className="">
       <div className="flex flex-row items-center bg-bgdark2 p-4">
         <h1 className="text-2xl">USER MANAGEMENT</h1>
         <button className="btn-primary btn mr-2 ml-auto">Add New User</button>
@@ -61,7 +65,7 @@ const EditUser: FC = () => {
           />
         );
       })}
-    </>
+    </main>
   );
 };
 
