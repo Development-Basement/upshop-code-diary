@@ -2,7 +2,7 @@ import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState, type FC } from "react";
+import { useEffect, useState, type FC } from "react";
 import { FiLogOut } from "react-icons/fi";
 
 const Header: FC = () => {
@@ -22,6 +22,14 @@ const Header: FC = () => {
     Admin: "/admin",
   };
 
+  const [currentURL, setCurrentURL] = useState<string>("/");
+
+  useEffect(() => {
+    if (currentURL != router.asPath) {
+      setCurrentURL(router.asPath);
+    }
+  }, [router.asPath, currentURL]);
+
   const handleSignOut = async () => {
     setSignOutDisabled(true);
     await signOut({ redirect: false });
@@ -36,14 +44,26 @@ const Header: FC = () => {
         {/* Admin links */}
         {isAdmin &&
           Object.entries(adminProtectedLinks).map((link) => (
-            <Link key={link[0]} href={link[1]} className="link no-underline">
+            <Link
+              key={link[0]}
+              href={link[1]}
+              className={`${"link"} ${
+                currentURL == link[1] ? "underline" : "no-underline"
+              }`}
+            >
               {link[0]}
             </Link>
           ))}
 
         {/* General links */}
         {Object.entries(unprotectedLinks).map((link) => (
-          <Link key={link[0]} href={link[1]} className="link no-underline">
+          <Link
+            key={link[0]}
+            href={link[1]}
+            className={`${"link"} ${
+              currentURL == link[1] ? "underline" : "no-underline"
+            }`}
+          >
             {link[0]}
           </Link>
         ))}
