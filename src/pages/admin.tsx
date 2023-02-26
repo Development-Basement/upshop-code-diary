@@ -1,6 +1,7 @@
 import { type GetServerSidePropsContext, type NextPage } from "next";
 import DbManagement from "../components/dbManagement";
-import EditUser from "../components/editUser";
+import Header from "../components/header";
+import ManageUsers from "../components/manageUsers";
 import PageWrapper from "../components/pageWrapper";
 import { getServerAuthSession } from "../server/auth";
 
@@ -9,9 +10,9 @@ const AdminDashboard: NextPage = () => {
     <PageWrapper showHeader={true}>
       <div className="h-full w-full">
         <DbManagement />
-        <EditUser />
-      </div>
-    </PageWrapper>
+        <ManageUsers />
+      </PageWrapper>
+    </div>
   );
 };
 
