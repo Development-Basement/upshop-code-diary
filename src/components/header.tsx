@@ -22,6 +22,8 @@ const Header: FC = () => {
     Admin: "/admin",
   };
 
+  const currentURL = router.asPath;
+
   const handleSignOut = async () => {
     setSignOutDisabled(true);
     await signOut({ redirect: false });
@@ -36,14 +38,26 @@ const Header: FC = () => {
         {/* Admin links */}
         {isAdmin &&
           Object.entries(adminProtectedLinks).map((link) => (
-            <Link key={link[0]} href={link[1]} className="link no-underline">
+            <Link
+              key={link[0]}
+              href={link[1]}
+              className={`${"link"} ${
+                currentURL === link[1] ? "underline" : "no-underline"
+              }`}
+            >
               {link[0]}
             </Link>
           ))}
 
         {/* General links */}
         {Object.entries(unprotectedLinks).map((link) => (
-          <Link key={link[0]} href={link[1]} className="link no-underline">
+          <Link
+            key={link[0]}
+            href={link[1]}
+            className={`${"link"} ${
+              currentURL === link[1] ? "underline" : "no-underline"
+            }`}
+          >
             {link[0]}
           </Link>
         ))}
