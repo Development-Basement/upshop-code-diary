@@ -65,7 +65,7 @@ export const CreateUserForm: FC<CreateUserFormProps> = ({ closeForm }) => {
       >
         <h2 className="text-lg text-white">Add new user</h2>
         <label className="input-group w-full">
-          <span className="w-40 shrink-0">Username</span>
+          <span className="w-44 shrink-0">Username</span>
           <input
             type="text"
             placeholder="username"
@@ -76,7 +76,7 @@ export const CreateUserForm: FC<CreateUserFormProps> = ({ closeForm }) => {
           />
         </label>
         <label className="input-group w-full">
-          <span className="w-40 shrink-0">Password</span>
+          <span className="w-44 shrink-0">Password</span>
           <input
             type="password"
             placeholder="password"
@@ -87,7 +87,7 @@ export const CreateUserForm: FC<CreateUserFormProps> = ({ closeForm }) => {
           />
         </label>
         <label className="input-group w-full">
-          <span className="w-40 shrink-0">Confirm password</span>
+          <span className="w-44 shrink-0">Confirm password</span>
           <input
             type="password"
             placeholder="confirm password"
@@ -98,7 +98,7 @@ export const CreateUserForm: FC<CreateUserFormProps> = ({ closeForm }) => {
           />
         </label>
         {isError && (
-          <div className="mt-2 flex flex-col gap-2 text-error">
+          <div className="mt-2 flex flex-col gap-2 text-sm text-error">
             {errors.username && (
               <p>
                 Username must be between 3 and 15 characters long and only
@@ -239,7 +239,7 @@ export const EditUserForm: FC<EditUserFormProps> = ({
           onSubmit={(e) => void handleSubmitUsername(onSubmitUsername)(e)}
         >
           <label className="input-group w-full">
-            <span className="w-40 shrink-0">Username</span>
+            <span className="w-44 shrink-0">Username</span>
             <input
               type="text"
               placeholder="username"
@@ -259,7 +259,7 @@ export const EditUserForm: FC<EditUserFormProps> = ({
             </button>
           </label>
           {(usernameErrors.username || usernameError) && (
-            <div className="mt-1 flex flex-col gap-2 text-error">
+            <div className="mt-1 flex flex-col gap-2 text-sm text-error">
               {usernameErrors.username && (
                 <p>
                   {usernameErrors.username.ref?.value === initialUsername
@@ -283,7 +283,7 @@ export const EditUserForm: FC<EditUserFormProps> = ({
           <div className="flex gap-4">
             <div className="flex w-full flex-col gap-2">
               <label className="input-group">
-                <span className="w-40 shrink-0">New password</span>
+                <span className="w-44 shrink-0">New password</span>
                 <input
                   type="password"
                   placeholder="password"
@@ -294,7 +294,7 @@ export const EditUserForm: FC<EditUserFormProps> = ({
                 />
               </label>
               <label className="input-group">
-                <span className="w-40 shrink-0">Confirm password</span>
+                <span className="w-44 shrink-0">Confirm password</span>
                 <input
                   type="password"
                   placeholder="confirm password"
@@ -320,7 +320,7 @@ export const EditUserForm: FC<EditUserFormProps> = ({
           {(passwordErrors.password ||
             passwordErrors.confirmPassword ||
             passwordError) && (
-            <div className="mt-1 flex flex-col gap-2 text-error">
+            <div className="mt-1 flex flex-col gap-2 text-sm text-error">
               {passwordErrors.password && (
                 <p>
                   Password must be at least 6 characters long and must not

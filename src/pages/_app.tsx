@@ -15,7 +15,6 @@ const MyApp: AppType<{ session: Session | null }> = ({
   Component,
   pageProps: { session, ...pageProps },
 }) => {
-  console.log(inter.variable);
   return (
     <SessionProvider session={session}>
       <ThemeContextProvider>
