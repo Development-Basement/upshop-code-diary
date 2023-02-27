@@ -42,7 +42,7 @@ const Header: FC = () => {
               key={link[0]}
               href={link[1]}
               className={`${"link"} ${
-                currentURL == link[1] ? "underline" : "no-underline"
+                currentURL === link[1] ? "underline" : "no-underline"
               }`}
             >
               {link[0]}
@@ -55,7 +55,7 @@ const Header: FC = () => {
             key={link[0]}
             href={link[1]}
             className={`${"link"} ${
-              currentURL == link[1] ? "underline" : "no-underline"
+              currentURL === link[1] ? "underline" : "no-underline"
             }`}
           >
             {link[0]}
