@@ -132,7 +132,6 @@ const extApiRouter = createTRPCRouter({
 export const recordsRouter = createTRPCRouter({
   listRecords: protectedProcedure
     .input(
-      // TODO: use cursor based pagination
       z.object({
         cursor: z.string().nullish(),
         limit: z.number().min(1).max(100).default(20),
@@ -163,10 +162,9 @@ export const recordsRouter = createTRPCRouter({
       // The limit might be 10 but only 6 records might exist... In that case we do not want to remove the last element as cursor, we ant to return undefined....
       if (records.length > input.limit) {
         // remove the last element to obtain it as a specific record....
-        const nextRecord = records.pop() as (typeof records)[number];
-
+        const nextRecord = records.pop();
         // set the cursor to the id of the record we want to at start next time...
-        nextCursor = nextRecord.id;
+        nextCursor = nextRecord?.id;
       }
 
       return {
@@ -310,7 +308,7 @@ export const recordsRouter = createTRPCRouter({
       }
       return record;
     }),
-    
+
   deleteRecord: protectedProcedure
     .input(z.object({ id: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {

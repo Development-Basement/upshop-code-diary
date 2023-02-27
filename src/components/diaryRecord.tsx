@@ -6,7 +6,7 @@ import Stars from "./stars";
 export type DiaryRecordProps = {
   name: string;
   language: string;
-  duration: number;
+  duration: string;
   date: Date;
   description: string;
   rating: number;
@@ -20,19 +20,16 @@ const DiaryRecord: FC<DiaryRecordProps> = ({
   description,
   rating,
 }) => {
-
-  const dateObj = new Date(date);
-
   return (
     <div className="mt-2 h-fit bg-tsbg1 p-5 shadow-thin-under-strong">
       <div className="flex flex-row text-xl">
         <p className="text-3xl text-white">{name} -&nbsp;</p>
         <p className="mt-auto">
           <span className="text-action-500">{language}</span> for
-          <span className="text-white">&nbsp;{duration} minutes</span>
+          <span className="text-white">&nbsp;{duration}</span>
         </p>
       </div>
-      <p className="mb-2">{`${dateObj.getDate()}. ${dateObj.getMonth()}. ${dateObj.getFullYear()} ${dateObj.toLocaleTimeString([], {hour12: true, hour: "numeric", minute: "2-digit"})}`}</p>
+      <p className="mb-2">{`${date.getDate()}. ${date.getMonth()}. ${date.getFullYear()}`}</p>
       <div className="mb-2">{description}</div>
       <Stars rating={rating} />
     </div>
