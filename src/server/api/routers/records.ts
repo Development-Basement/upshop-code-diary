@@ -134,8 +134,8 @@ export const recordsRouter = createTRPCRouter({
     .input(
       // TODO: use cursor based pagination
       z.object({
+        cursor: z.string().nullish(),
         limit: z.number().min(1).max(100).default(20),
-        offset: z.number().min(0).default(0),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -152,11 +152,29 @@ export const recordsRouter = createTRPCRouter({
         orderBy: {
           date: "desc",
         },
-        take: input.limit,
-        skip: input.offset,
+        take: input.limit + 1,
+        // if cursor doesn§t exist, we want to return undefined which indicates that we want to start at element 0
+        cursor: input.cursor ? { id: input.cursor } : undefined,
       });
-      return { records, nextOffset: input.offset + records.length };
+
+      // define the type for the cursor, if the curosor wasn't provided it is undefined. Undefined cursor means: start at element 0...
+      let nextCursor: typeof input.cursor | undefined = undefined;
+
+      // The limit might be 10 but only 6 records might exist... In that case we do not want to remove the last element as cursor, we ant to return undefined....
+      if (records.length > input.limit) {
+        // remove the last element to obtain it as a specific record....
+        const nextRecord = records.pop() as (typeof records)[number];
+
+        // set the cursor to the id of the record we want to at start next time...
+        nextCursor = nextRecord.id;
+      }
+
+      return {
+        records,
+        nextCursor,
+      };
     }),
+
   listRecordsFromUser: publicProcedure
     .input(
       z.object({
@@ -180,6 +198,7 @@ export const recordsRouter = createTRPCRouter({
       });
       return records;
     }),
+
   doesRecordBelongToUser: publicProcedure
     .input(
       z.object({
@@ -199,6 +218,7 @@ export const recordsRouter = createTRPCRouter({
       });
       return record?.userId === input.userId;
     }),
+
   getSingleRecord: publicProcedure
     .input(z.object({ id: z.string().min(1) }))
     .output(DiaryRecordParser.nullable())
@@ -218,6 +238,7 @@ export const recordsRouter = createTRPCRouter({
       });
       return record;
     }),
+
   createRecord: protectedProcedure
     .input(DiaryRecordParser.omit({ id: true }))
     .output(DiaryRecordWithUserParser)
@@ -245,6 +266,7 @@ export const recordsRouter = createTRPCRouter({
       });
       return record;
     }),
+
   updateRecord: protectedProcedure
     .input(
       z.object({ id: z.string().min(1), record: DiaryRecordParser.partial() }),
@@ -288,6 +310,7 @@ export const recordsRouter = createTRPCRouter({
       }
       return record;
     }),
+    
   deleteRecord: protectedProcedure
     .input(z.object({ id: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
