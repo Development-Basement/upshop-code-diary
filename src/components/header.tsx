@@ -27,7 +27,7 @@ const Header: FC = () => {
   const handleSignOut = async () => {
     setSignOutDisabled(true);
     await signOut({ redirect: false });
-    await router.push("/signin");
+    await router.push("/login");
     setSignOutDisabled(false);
   };
 
@@ -68,7 +68,7 @@ const Header: FC = () => {
           disabled={signOutDisabled}
           onClick={() => void handleSignOut()}
           title="Sign out"
-          className="text-red-500 outline-2 outline-offset-2 outline-current hover:text-red-700 focus:outline disabled:text-gray-500"
+          className="text-red-500 outline-2 outline-offset-2 outline-current focus:outline disabled:text-gray-500 hover:text-red-700"
         >
           <FiLogOut />
         </button>
