@@ -18,6 +18,9 @@ module.exports = {
       boxShadow: {
         "thin-under-strong": "0 4px 4px 0px rgba(0,0,0,0.25)",
       },
+      fontFamily: {
+        sans: ["var(--font-inter)"],
+      },
     },
   },
   plugins: [
