@@ -25,7 +25,7 @@ export const CreateUserForm: FC<CreateUserFormProps> = ({ closeForm }) => {
     .object({
       username: usernameSchema,
       password: passwordSchema,
-      confirmPassword: passwordSchema,
+      confirmPassword: z.string(),
     })
     .refine((data) => data.password === data.confirmPassword, {
       message: "Passwords do not match",
@@ -154,7 +154,7 @@ export const EditUserForm: FC<EditUserFormProps> = ({
   const passwordValidationSchema = z
     .object({
       password: passwordSchema,
-      confirmPassword: passwordSchema,
+      confirmPassword: z.string(),
     })
     .refine((data) => data.password === data.confirmPassword, {
       message: "Passwords do not match",
@@ -328,7 +328,7 @@ export const EditUserForm: FC<EditUserFormProps> = ({
                 </p>
               )}
               {passwordErrors.confirmPassword && (
-                <p>Passwords don&apos;t match! Please try again.</p>
+                <p>Passwords don&apos;t match!</p>
               )}
               {passwordError && (
                 <p>
