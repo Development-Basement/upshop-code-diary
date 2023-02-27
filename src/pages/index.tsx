@@ -9,7 +9,7 @@ import { dayts } from "../utils/day";
 const Home: NextPage = ({}) => {
   const { data, hasNextPage, fetchNextPage, isFetching } =
     api.records.listRecords.useInfiniteQuery(
-      { limit: 1 },
+      { limit: 10 },
       { getNextPageParam: (lastPage) => lastPage.nextCursor },
     );
 
@@ -38,8 +38,9 @@ const Home: NextPage = ({}) => {
           );
         })}
 
-        {hasNextPage && !isFetching ? (
+        {hasNextPage ? (
           <button
+            disabled={isFetching}
             className="btn-primary btn mb-40 mt-4 w-full items-center rounded-md text-lg font-bold text-white"
             onClick={() => {
               void fetchNextPage();
