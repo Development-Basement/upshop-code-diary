@@ -176,7 +176,6 @@ export const recordsRouter = createTRPCRouter({
           programmingLanguage: true,
           rating: true,
           description: true,
-          user: true,
         },
       });
       return records;
