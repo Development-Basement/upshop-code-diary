@@ -38,19 +38,23 @@ const Home: NextPage = ({}) => {
           );
         })}
 
-        {hasNextPage ? (
-          <button
-            disabled={isFetching}
-            className="btn-primary btn mb-40 mt-4 w-full items-center rounded-md text-lg font-bold text-white"
-            onClick={() => {
-              void fetchNextPage();
-            }}
-          >
-            Load more records
-          </button>
-        ) : (
-          <span className="mb-40 mt-4 text-center">{"No more records :("}</span>
-        )}
+        <div>
+          {hasNextPage ? (
+            <button
+              disabled={isFetching}
+              className="btn-primary btn mb-40 mt-4 w-full items-center rounded-md text-lg font-bold text-white"
+              onClick={() => {
+                void fetchNextPage();
+              }}
+            >
+              Load more records
+            </button>
+          ) : (
+            <span className="mb-40 mt-4 text-center">
+              {"No more records :("}
+            </span>
+          )}
+        </div>
       </main>
     </PageWrapper>
   );

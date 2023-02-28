@@ -1,9 +1,12 @@
+import { Dialog, Transition } from "@headlessui/react";
 import { signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState, type FC } from "react";
+import { Fragment, useState, type FC } from "react";
 import { FiLogOut } from "react-icons/fi";
+// Next font not working with headless Dialog by default, idk why, just set it manually in Dialog.Pannel
+import { inter } from "../pages/_app";
 
 const Header: FC = () => {
   const { data: session } = useSession();
@@ -31,8 +34,70 @@ const Header: FC = () => {
     setSignOutDisabled(false);
   };
 
+  const [isOpen, setIsOpen] = useState(false);
+
+  function closeModal() {
+    setIsOpen(false);
+  }
+
+  function openModal() {
+    setIsOpen(true);
+  }
+
   return (
     <div className="sticky top-0 flex w-full items-center bg-bgdark1 px-5 py-4 text-lg text-white shadow-thin-under-strong">
+      <Transition appear show={isOpen} as={Fragment}>
+        <Dialog as="div" className="relative z-10" onClose={closeModal}>
+          {/* The screen darkening part */}
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-black bg-opacity-75" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 overflow-y-auto">
+            <div className="flex min-h-full w-full items-center justify-center p-4 text-center">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95"
+                enterTo="opacity-100 scale-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100"
+                leaveTo="opacity-0 scale-95"
+              >
+                <Dialog.Panel
+                  className={`w-full max-w-md overflow-hidden rounded-2xl bg-bgdark1 p-6 text-left align-middle font-sans ${inter.variable} text-white shadow-xl transition-all`}
+                >
+                  <Dialog.Title
+                    as="h3"
+                    className="text-lg font-medium leading-6"
+                  >
+                    Create new record
+                  </Dialog.Title>
+
+                  <div className="mt-4 flex w-full justify-end">
+                    <button
+                      type="button"
+                      className="btn-primary btn text-white"
+                      onClick={closeModal}
+                    >
+                      Create
+                    </button>
+                  </div>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </div>
+        </Dialog>
+      </Transition>
+
       <Image src="/logoV3.png" alt="logo" width={40} height={40} className="" />
       <div className="ml-auto flex gap-8">
         {/* Admin links */}
@@ -63,7 +128,12 @@ const Header: FC = () => {
         ))}
 
         {/* Action buttons */}
-        <button className="link-primary link no-underline">Create</button>
+        <button
+          className="link-primary link no-underline"
+          onClick={() => openModal()}
+        >
+          Create
+        </button>
         <button
           disabled={signOutDisabled}
           onClick={() => void handleSignOut()}

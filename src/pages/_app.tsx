@@ -6,7 +6,7 @@ import { ThemeContextProvider } from "../contexts/themeContext";
 import "../styles/globals.css";
 import { api } from "../utils/api";
 
-const inter = Inter({
+export const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
 });
