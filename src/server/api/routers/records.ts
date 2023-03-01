@@ -2,14 +2,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure, publicProcedure } from "../trpc";
 
-const DiaryRecordParser = z.object({
-  id: z.string().min(1),
-  date: z.date(),
-  timeSpent: z.string().min(1), // ISO 8601 duration
-  programmingLanguage: z.string().min(1).max(30),
-  rating: z.number().min(0).max(5),
-  description: z.string().min(1),
-});
+import { DiaryRecordParser } from "../../../types/record";
 
 const DiaryRecordWithUserParser = DiaryRecordParser.extend({
   user: z.object({

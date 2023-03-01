@@ -31,18 +31,22 @@ export const CreateUserForm: FC<CreateUserFormProps> = ({ closeForm }) => {
       message: "Passwords do not match",
       path: ["confirmPassword"],
     });
+
   type ValidationSchema = z.infer<typeof validationSchema>;
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<ValidationSchema>({ resolver: zodResolver(validationSchema) });
+
   const utils = api.useContext();
+
   const {
     mutate: createUser,
     error: creationError,
     isLoading: creatingUser,
   } = api.users.createUser.useMutation();
+
   const onSubmit: SubmitHandler<ValidationSchema> = (data) => {
     const { confirmPassword, ...rest } = data;
     createUser(rest, {
@@ -52,11 +56,13 @@ export const CreateUserForm: FC<CreateUserFormProps> = ({ closeForm }) => {
       },
     });
   };
+
   const isError =
     creationError !== null ||
     [errors.username, errors.password, errors.confirmPassword].some(
       (error) => error !== undefined,
     );
+
   return (
     <div className="my-2 h-fit bg-tsbg1 p-5 shadow-thin-under-strong">
       <form
@@ -151,6 +157,7 @@ export const EditUserForm: FC<EditUserFormProps> = ({
       message: "Username must be different from the current one",
       path: ["username"],
     });
+
   const passwordValidationSchema = z
     .object({
       password: passwordSchema,
@@ -160,8 +167,10 @@ export const EditUserForm: FC<EditUserFormProps> = ({
       message: "Passwords do not match",
       path: ["confirmPassword"],
     });
+
   type UsernameValidationSchema = z.infer<typeof usernameValidationSchema>;
   type PasswordValidationSchema = z.infer<typeof passwordValidationSchema>;
+
   const {
     register: registerUsername,
     handleSubmit: handleSubmitUsername,
@@ -170,6 +179,7 @@ export const EditUserForm: FC<EditUserFormProps> = ({
     resolver: zodResolver(usernameValidationSchema),
     defaultValues: { username: initialUsername },
   });
+
   const {
     register: registerPassword,
     handleSubmit: handleSubmitPassword,
@@ -177,24 +187,29 @@ export const EditUserForm: FC<EditUserFormProps> = ({
   } = useForm<PasswordValidationSchema>({
     resolver: zodResolver(passwordValidationSchema),
   });
+
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
   const utils = api.useContext();
+
   const {
     mutate: changeUsername,
     error: usernameError,
     isLoading: changingUsername,
   } = api.users.changeUsername.useMutation();
+
   const {
     mutate: changePassword,
     error: passwordError,
     isLoading: changingPassword,
   } = api.users.changePassword.useMutation();
+
   const {
     mutate: deleteUser,
     error: deletionError,
     isLoading: deletingUser,
   } = api.users.deleteUser.useMutation();
+
   const onSubmitUsername: SubmitHandler<UsernameValidationSchema> = (data) => {
     changeUsername(
       { userId, newUsername: data.username },
@@ -206,6 +221,7 @@ export const EditUserForm: FC<EditUserFormProps> = ({
       },
     );
   };
+
   const onSubmitPassword: SubmitHandler<PasswordValidationSchema> = (data) => {
     changePassword(
       { userId, newPassword: data.password },
@@ -217,6 +233,7 @@ export const EditUserForm: FC<EditUserFormProps> = ({
       },
     );
   };
+
   const onDeleteUser = () => {
     deleteUser(
       { userId },
