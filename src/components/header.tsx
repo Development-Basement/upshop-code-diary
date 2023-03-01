@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import { inter } from "../pages/_app";
 import { type DiaryRecord } from "../server/api/routers/records";
 import { DiaryRecordParser } from "../types/record";
+import { api } from "../utils/api";
 import { dayts } from "../utils/day";
 
 const Header: FC = () => {
@@ -43,7 +44,7 @@ const Header: FC = () => {
 
   function closeModal() {
     reset();
-    // setRatingValue(0);
+    setRatingValue(0);
     setHours(0);
     setMinutes(0);
     setSeconds(0);
@@ -52,7 +53,7 @@ const Header: FC = () => {
 
   function openModal() {
     reset();
-    // setRatingValue(0);
+    setRatingValue(0);
     setHours(0);
     setMinutes(0);
     setSeconds(0);
@@ -86,7 +87,7 @@ const Header: FC = () => {
         .duration({ hours: hours, minutes: minutes, seconds: seconds })
         .toISOString(),
     );
-    void trigger();
+    void trigger("timeSpent");
   }, [hours, minutes, seconds, setValue, trigger]);
 
   const [ratingValue, setRatingValue] = useState(0);
@@ -102,6 +103,24 @@ const Header: FC = () => {
   useEffect(() => {
     setValue("rating", ratingValue);
   }, [ratingValue, setValue]);
+
+  const onSubmit = (data: DiaryRecord) => {
+    const timezoneOffset = data.date.getTimezoneOffset();
+    if (timezoneOffset > 0) {
+      data.date = dayts(data.date).subtract(timezoneOffset, "minutes").toDate();
+    } else {
+      data.date = dayts(data.date).add(timezoneOffset, "minutes").toDate();
+    }
+    createRecord({
+      date: data.date,
+      rating: data.rating,
+      timeSpent: data.timeSpent,
+      description: data.description,
+      programmingLanguage: data.programmingLanguage,
+    });
+  };
+
+  const { mutate: createRecord } = api.records.createRecord.useMutation();
 
   return (
     <div className="sticky top-0 flex w-full items-center bg-bgdark1 px-5 py-4 text-lg text-white shadow-thin-under-strong">
@@ -144,7 +163,7 @@ const Header: FC = () => {
                   <form
                     className="mt-4 flex flex-col gap-4"
                     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                    onSubmit={handleSubmit((data) => console.log(data))}
+                    onSubmit={handleSubmit((data) => onSubmit(data))}
                   >
                     {/* Language */}
                     <div className="flex flex-col gap-1">
