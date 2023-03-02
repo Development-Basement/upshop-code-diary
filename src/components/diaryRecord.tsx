@@ -1,19 +1,19 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
-import { Dispatch, SetStateAction, useEffect, useState, type FC } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { AiFillEdit } from "react-icons/ai";
+import { useEffect, useState, type FC } from "react";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import { IoMdClose } from "react-icons/io";
-import { DiaryRecord as DiaryRecordType } from "../server/api/routers/records";
+import { MdEdit } from "react-icons/md";
+import { type DiaryRecord as DiaryRecordType } from "../server/api/routers/records";
 import { DiaryRecordParser } from "../types/record";
 import { api } from "../utils/api";
 import { dayts } from "../utils/day";
 import Stars from "./stars";
 
-interface DiaryRecordProps extends DiaryRecordType {
+type DiaryRecordProps = {
   userId: string;
   userName: string;
-}
+} & DiaryRecordType;
 
 const DiaryRecord: FC<DiaryRecordProps> = (props) => {
   const { data: session } = useSession();
@@ -37,9 +37,9 @@ const DiaryRecord: FC<DiaryRecordProps> = (props) => {
 
 export default DiaryRecord;
 
-interface EditRecordProps extends DiaryRecordProps {
-  setIsEditing: Dispatch<SetStateAction<boolean>>;
-}
+type EditRecordProps = {
+  setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
+} & DiaryRecordProps;
 
 const EditRecord: FC<EditRecordProps> = (props) => {
   const DiaryRecordSchema = DiaryRecordParser.omit({ id: true });
@@ -49,7 +49,6 @@ const EditRecord: FC<EditRecordProps> = (props) => {
     formState: { errors },
     handleSubmit,
     setValue,
-    reset,
     trigger,
   } = useForm<DiaryRecordType>({
     resolver: zodResolver(DiaryRecordSchema),
@@ -66,7 +65,7 @@ const EditRecord: FC<EditRecordProps> = (props) => {
 
   useEffect(() => {
     setValue("date", dateValue);
-  }, [dateValue]);
+  }, [dateValue, setValue]);
 
   const [hours, setHours] = useState(dayts.duration(props.timeSpent).hours());
   const [minutes, setMinutes] = useState(
@@ -99,15 +98,12 @@ const EditRecord: FC<EditRecordProps> = (props) => {
       },
       {
         onSuccess: () => {
-          console.log("invalidate");
           void utils.records.listRecords.invalidate();
-          void utils.records.listRecordsFromUser.invalidate();
-          console.log("invalidated");
+          void utils.records.listUserRecords.invalidate();
+          props.setIsEditing(false);
         },
       },
     );
-
-    props.setIsEditing(false);
   };
 
   useEffect(() => {
@@ -119,10 +115,13 @@ const EditRecord: FC<EditRecordProps> = (props) => {
       <div className="flex w-full items-center justify-between">
         <p className="flex items-center gap-2 text-3xl text-slate-400">
           Editing
-          <span className=" text-white">{props.userName}s</span>
+          <span className=" text-white">{props.userName}&apos;s</span>
           record
         </p>
-        <button onClick={() => props.setIsEditing(false)}>
+        <button
+          className="btn-ghost btn-square btn-sm btn"
+          onClick={() => props.setIsEditing(false)}
+        >
           <IoMdClose className="text-2xl" />
         </button>
       </div>
@@ -308,9 +307,9 @@ const EditRecord: FC<EditRecordProps> = (props) => {
   );
 };
 
-interface ViewRecordProps extends EditRecordProps {
+type ViewRecordProps = {
   serverUserId: string;
-}
+} & EditRecordProps;
 
 const ViewRecord: FC<ViewRecordProps> = (props) => {
   return (
@@ -328,11 +327,12 @@ const ViewRecord: FC<ViewRecordProps> = (props) => {
         </div>
         {props.userId === props.serverUserId && (
           <button
+            className="btn-ghost btn-square btn-sm btn"
             onClick={() => {
               props.setIsEditing(true);
             }}
           >
-            <AiFillEdit />
+            <MdEdit className="text-2xl" />
           </button>
         )}
       </div>

@@ -19,7 +19,7 @@ export const usersRouter = createTRPCRouter({
   listUsers: publicProcedure
     .input(
       z.object({
-        limit: z.number().min(1).max(100).default(50),
+        limit: z.number().min(1).max(100).default(20),
         cursor: z.string().min(1).optional(),
       }),
     )

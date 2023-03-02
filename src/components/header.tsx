@@ -9,8 +9,9 @@ import { FiLogOut } from "react-icons/fi";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Head from "next/head";
 import { useForm } from "react-hook-form";
+import { SubmitHandler } from "react-hook-form/dist/types";
+import { type z } from "zod";
 import { inter } from "../pages/_app";
-import { type DiaryRecord } from "../server/api/routers/records";
 import { DiaryRecordParser } from "../types/record";
 import { api } from "../utils/api";
 import { dayts } from "../utils/day";
@@ -46,12 +47,12 @@ const Header: FC = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   function closeModal() {
+    setIsOpen(false);
     reset();
     setRatingValue(0);
     setHours(0);
     setMinutes(0);
     setSeconds(0);
-    setIsOpen(false);
   }
 
   function openModal() {
@@ -64,6 +65,7 @@ const Header: FC = () => {
   }
 
   const DiaryRecordSchema = DiaryRecordParser.omit({ id: true });
+  type DiaryRecord = z.infer<typeof DiaryRecordSchema>;
 
   const {
     register,
@@ -99,13 +101,7 @@ const Header: FC = () => {
     setValue("rating", ratingValue);
   }, [ratingValue, setValue]);
 
-  const onSubmit = (data: DiaryRecord) => {
-    const timezoneOffset = data.date.getTimezoneOffset();
-    if (timezoneOffset > 0) {
-      data.date = dayts(data.date).subtract(timezoneOffset, "minutes").toDate();
-    } else {
-      data.date = dayts(data.date).add(timezoneOffset, "minutes").toDate();
-    }
+  const onSubmit: SubmitHandler<DiaryRecord> = (data) => {
     createRecord(
       {
         date: data.date,
@@ -117,8 +113,7 @@ const Header: FC = () => {
       {
         onSuccess: () => {
           void utils.records.listRecords.invalidate();
-          void utils.records.listRecordsFromUser.invalidate();
-          console.log("invalidated");
+          void utils.records.listUserRecords.invalidate();
           closeModal();
         },
       },
@@ -135,10 +130,12 @@ const Header: FC = () => {
     );
     return currentLink?.[0] ?? "CodeDiary"; // lol this syntax
   };
+  const titleText = `UpShop - ${getCurrentLinkKey()}`;
+
   return (
     <>
       <Head>
-        <title>UpShop - {getCurrentLinkKey()}</title>
+        <title>{titleText}</title>
       </Head>
       <div className="sticky top-0 flex w-full items-center bg-bgdark1 px-5 py-4 text-lg text-white shadow-thin-under-strong">
         <Image
