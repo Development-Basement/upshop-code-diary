@@ -4,7 +4,7 @@ import PageWrapper from "../components/pageWrapper";
 import { getServerAuthSession } from "../server/auth";
 import { api } from "../utils/api";
 
-const myRecords: NextPage = ({}) => {
+const MyRecords: NextPage = () => {
   const { data, hasNextPage, fetchNextPage, isFetching } =
     api.records.listUserRecords.useInfiniteQuery(
       { limit: 10 },
@@ -33,17 +33,19 @@ const myRecords: NextPage = ({}) => {
           );
         })}
 
-        <button
-          disabled={isFetching || !hasNextPage}
-          className={`btn-primary btn mt-4 w-full items-center rounded-md text-lg font-bold text-white ${
-            isFetching ? "loading" : ""
-          }`}
-          onClick={() => {
-            void fetchNextPage();
-          }}
-        >
-          {hasNextPage ? "Load more records" : "No more records :("}
-        </button>
+        <div>
+          <button
+            disabled={isFetching || !hasNextPage}
+            className={`btn-primary btn mt-4 mb-20 w-full items-center rounded-md text-lg font-bold ${
+              isFetching ? "loading" : ""
+            }`}
+            onClick={() => {
+              void fetchNextPage();
+            }}
+          >
+            {hasNextPage ? "Load more records" : "No more records :("}
+          </button>
+        </div>
       </main>
     </PageWrapper>
   );
@@ -66,4 +68,4 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   };
 }
 
-export default myRecords;
+export default MyRecords;
