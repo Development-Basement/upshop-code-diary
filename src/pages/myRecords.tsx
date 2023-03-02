@@ -4,7 +4,6 @@ import DiaryRecord from "../components/diaryRecord";
 import PageWrapper from "../components/pageWrapper";
 import { getServerAuthSession } from "../server/auth";
 import { api } from "../utils/api";
-import { dayts } from "../utils/day";
 
 const myRecords: NextPage = ({}) => {
   const { data, hasNextPage, fetchNextPage, isFetching } =
@@ -28,10 +27,11 @@ const myRecords: NextPage = ({}) => {
           return (
             <DiaryRecord
               key={record.id}
+              id={record.id}
               userId={record.userId}
-              name={record.user.name}
-              language={record.programmingLanguage}
-              duration={dayts.duration(record.timeSpent).humanize()}
+              userName={record.user.name}
+              programmingLanguage={record.programmingLanguage}
+              timeSpent={record.timeSpent}
               date={record.date}
               description={record.description}
               rating={record.rating}

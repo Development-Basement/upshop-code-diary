@@ -13,6 +13,7 @@ import { type DiaryRecord } from "../server/api/routers/records";
 import { DiaryRecordParser } from "../types/record";
 import { api } from "../utils/api";
 import { dayts } from "../utils/day";
+import Stars from "./stars";
 
 const Header: FC = () => {
   const { data: session } = useSession();
@@ -92,14 +93,6 @@ const Header: FC = () => {
   }, [hours, minutes, seconds, setValue, trigger]);
 
   const [ratingValue, setRatingValue] = useState(0);
-
-  const handleRatingValueUpdate = (newValue: number) => {
-    if (newValue === ratingValue) {
-      setRatingValue(0);
-    } else {
-      setRatingValue(newValue);
-    }
-  };
 
   useEffect(() => {
     setValue("rating", ratingValue);
@@ -333,55 +326,8 @@ const Header: FC = () => {
 
                     {/* Rating */}
                     <div className="flex flex-col gap-1">
-                      <div className="rating">
-                        <input
-                          type="radio"
-                          name="rating-4"
-                          className="hidden"
-                          checked={ratingValue === 0}
-                          onChange={() => handleRatingValueUpdate(0)}
-                        />
-                        <input
-                          type="radio"
-                          name="rating-4"
-                          className="mask mask-star-2 bg-green-500"
-                          checked={ratingValue === 1}
-                          // onChange={() => handleRatingValueUpdate(1)}
-                          onClick={() => handleRatingValueUpdate(1)}
-                        />
-                        <input
-                          type="radio"
-                          name="rating-4"
-                          className="mask mask-star-2 bg-green-500"
-                          checked={ratingValue === 2}
-                          // onChange={() => handleRatingValueUpdate(2)}
-                          onClick={() => handleRatingValueUpdate(2)}
-                        />
-                        <input
-                          type="radio"
-                          name="rating-4"
-                          className="mask mask-star-2 bg-green-500"
-                          checked={ratingValue === 3}
-                          // onChange={() => handleRatingValueUpdate(3)}
-                          onClick={() => handleRatingValueUpdate(3)}
-                        />
-                        <input
-                          type="radio"
-                          name="rating-4"
-                          className="mask mask-star-2 bg-green-500"
-                          checked={ratingValue === 4}
-                          // onChange={() => handleRatingValueUpdate(4)}
-                          onClick={() => handleRatingValueUpdate(4)}
-                        />
-                        <input
-                          type="radio"
-                          name="rating-4"
-                          className="mask mask-star-2 bg-green-500"
-                          checked={ratingValue === 5}
-                          // onChange={() => handleRatingValueUpdate(5)}
-                          onClick={() => handleRatingValueUpdate(5)}
-                        />
-                      </div>
+                      <Stars rating={ratingValue} setRating={setRatingValue} />
+
                       <div className="">
                         <label
                           htmlFor="rating"
