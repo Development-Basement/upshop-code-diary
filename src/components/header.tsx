@@ -105,17 +105,26 @@ const Header: FC = () => {
     } else {
       data.date = dayts(data.date).add(timezoneOffset, "minutes").toDate();
     }
-    createRecord({
-      date: data.date,
-      rating: data.rating,
-      timeSpent: data.timeSpent,
-      description: data.description,
-      programmingLanguage: data.programmingLanguage,
-    });
-
-    closeModal();
+    createRecord(
+      {
+        date: data.date,
+        rating: data.rating,
+        timeSpent: data.timeSpent,
+        description: data.description,
+        programmingLanguage: data.programmingLanguage,
+      },
+      {
+        onSuccess: () => {
+          void utils.records.listRecords.invalidate();
+          void utils.records.listRecordsFromUser.invalidate();
+          console.log("invalidated");
+          closeModal();
+        },
+      },
+    );
   };
 
+  const utils = api.useContext();
   const { mutate: createRecord } = api.records.createRecord.useMutation();
 
   return (
@@ -132,7 +141,7 @@ const Header: FC = () => {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black bg-opacity-75" />
+            <div className="fixed inset-0 bg-black/75" />
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto">
@@ -158,8 +167,7 @@ const Header: FC = () => {
 
                   <form
                     className="mt-4 flex flex-col gap-4"
-                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                    onSubmit={handleSubmit((data) => onSubmit(data))}
+                    onSubmit={(e) => void handleSubmit(onSubmit)(e)}
                   >
                     {/* Language */}
                     <div className="flex flex-col gap-1">

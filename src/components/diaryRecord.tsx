@@ -99,15 +99,24 @@ const EditRecord: FC<EditRecordProps> = (props) => {
     } else {
       data.date = dayts(data.date).add(timezoneOffset, "minutes").toDate();
     }
-    console.log(data);
-    updateRecord({
-      id: props.id,
-      record: data,
-    });
+    updateRecord(
+      {
+        id: props.id,
+        record: data,
+      },
+      {
+        onSuccess: () => {
+          void utils.records.listRecords.invalidate();
+          void utils.records.listRecordsFromUser.invalidate();
+          console.log("invalidated");
+        },
+      },
+    );
 
     props.setIsEditing(false);
   };
 
+  const utils = api.useContext();
   const { mutate: updateRecord } = api.records.updateRecord.useMutation({});
 
   return (
@@ -125,8 +134,7 @@ const EditRecord: FC<EditRecordProps> = (props) => {
 
       <form
         className="mt-4 flex flex-col gap-4"
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onSubmit={handleSubmit((data) => onSubmit(data))}
+        onSubmit={(e) => void handleSubmit(onSubmit)(e)}
       >
         <div className="flex flex-col gap-1">
           <input
@@ -331,7 +339,9 @@ const ViewRecord: FC<ViewRecordProps> = (props) => {
           </button>
         )}
       </div>
-      <p className="mb-2">{`${props.date.getDate()}. ${props.date.getMonth()}. ${props.date.getFullYear()}`}</p>
+      <p className="mb-2">{`${props.date.getDate()}. ${
+        props.date.getMonth() + 1
+      }. ${props.date.getFullYear()}`}</p>
       <div className="mb-2">{props.description}</div>
       <Stars rating={props.rating} />
     </div>

@@ -39,23 +39,17 @@ const myRecords: NextPage = ({}) => {
           );
         })}
 
-        <div>
-          {hasNextPage ? (
-            <button
-              disabled={isFetching}
-              className="btn-primary btn mb-40 mt-4 w-full items-center rounded-md text-lg font-bold text-white"
-              onClick={() => {
-                void fetchNextPage();
-              }}
-            >
-              Load more records
-            </button>
-          ) : (
-            <span className="mb-40 mt-4 text-center">
-              {"No more records :("}
-            </span>
-          )}
-        </div>
+        <button
+          disabled={isFetching || !hasNextPage}
+          className={`btn-primary btn mt-4 w-full items-center rounded-md text-lg font-bold text-white ${
+            isFetching ? "loading" : ""
+          }`}
+          onClick={() => {
+            void fetchNextPage();
+          }}
+        >
+          {hasNextPage ? "Load more records" : "No more records :("}
+        </button>
       </main>
     </PageWrapper>
   );
