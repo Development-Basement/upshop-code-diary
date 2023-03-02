@@ -28,10 +28,11 @@ const Home: NextPage = ({}) => {
           return (
             <DiaryRecord
               key={record.id}
+              id={record.id}
               userId={record.userId}
-              name={record.user.name}
-              language={record.programmingLanguage}
-              duration={dayts.duration(record.timeSpent).humanize()}
+              userName={record.user.name}
+              programmingLanguage={record.programmingLanguage}
+              timeSpent={dayts.duration(record.timeSpent).humanize()}
               date={record.date}
               description={record.description}
               rating={record.rating}
