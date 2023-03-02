@@ -190,6 +190,55 @@ export const recordsRouter = createTRPCRouter({
       return records;
     }),
 
+  // I dunno weather you take userId as input beacuse of the api, but I prefre checking on the server...
+  listUserRecords: protectedProcedure
+    .input(
+      z.object({
+        cursor: z.string().nullish(),
+        limit: z.number().min(1).max(100).default(20),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const userId = ctx.session.user.id;
+
+      const records = await ctx.prisma.record.findMany({
+        where: {
+          userId: userId,
+        },
+        include: {
+          user: {
+            select: {
+              id: true,
+              name: true,
+              isAdmin: true,
+            },
+          },
+        },
+        orderBy: {
+          date: "desc",
+        },
+        take: input.limit + 1,
+        // if cursor doesn§t exist, we want to return undefined which indicates that we want to start at element 0
+        cursor: input.cursor ? { id: input.cursor } : undefined,
+      });
+
+      // define the type for the cursor, if the curosor wasn't provided it is undefined. Undefined cursor means: start at element 0...
+      let nextCursor: typeof input.cursor | undefined = undefined;
+
+      // The limit might be 10 but only 6 records might exist... In that case we do not want to remove the last element as cursor, we ant to return undefined....
+      if (records.length > input.limit) {
+        // remove the last element to obtain it as a specific record....
+        const nextRecord = records.pop();
+        // set the cursor to the id of the record we want to at start next time...
+        nextCursor = nextRecord?.id;
+      }
+
+      return {
+        records,
+        nextCursor,
+      };
+    }),
+
   doesRecordBelongToUser: publicProcedure
     .input(
       z.object({

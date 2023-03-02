@@ -25,6 +25,7 @@ const Header: FC = () => {
   // Idk, it's not really neccesary to do it this way for a few links, but doesn't hurt either...
   const unprotectedLinks = {
     Dashboard: "/",
+    "My records": "/myRecords",
   };
 
   const adminProtectedLinks = {
@@ -118,6 +119,8 @@ const Header: FC = () => {
       description: data.description,
       programmingLanguage: data.programmingLanguage,
     });
+
+    closeModal();
   };
 
   const { mutate: createRecord } = api.records.createRecord.useMutation();
