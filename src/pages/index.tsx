@@ -1,5 +1,4 @@
 import { type GetServerSidePropsContext, type NextPage } from "next";
-import Head from "next/head";
 import DiaryRecord from "../components/diaryRecord";
 import PageWrapper from "../components/pageWrapper";
 import { getServerAuthSession } from "../server/auth";
@@ -17,9 +16,6 @@ const Home: NextPage = ({}) => {
 
   return (
     <PageWrapper showHeader={true}>
-      <Head>
-        <title>UpShop - Dashboard</title>
-      </Head>
       <main className="flex h-full w-full flex-col gap-2">
         {records.map((record) => {
           return (

@@ -7,6 +7,7 @@ import { Fragment, useEffect, useState, type FC } from "react";
 import { FiLogOut } from "react-icons/fi";
 // Next font not working with headless Dialog by default, idk why, just set it manually in Dialog.Pannel
 import { zodResolver } from "@hookform/resolvers/zod";
+import Head from "next/head";
 import { useForm } from "react-hook-form";
 import { inter } from "../pages/_app";
 import { type DiaryRecord } from "../server/api/routers/records";
@@ -127,8 +128,71 @@ const Header: FC = () => {
   const utils = api.useContext();
   const { mutate: createRecord } = api.records.createRecord.useMutation();
 
+  const getCurrentLinkKey = () => {
+    const links = { ...unprotectedLinks, ...adminProtectedLinks };
+    const currentLink = Object.entries(links).find(
+      (link) => link[1] === currentURL,
+    );
+    return currentLink?.[0] ?? "CodeDiary"; // lol this syntax
+  };
   return (
-    <div className="sticky top-0 flex w-full items-center bg-bgdark1 px-5 py-4 text-lg text-white shadow-thin-under-strong">
+    <>
+      <Head>
+        <title>UpShop - {getCurrentLinkKey()}</title>
+      </Head>
+      <div className="sticky top-0 flex w-full items-center bg-bgdark1 px-5 py-4 text-lg text-white shadow-thin-under-strong">
+        <Image
+          src="/logoV3.png"
+          alt="logo"
+          width={40}
+          height={40}
+          className=""
+        />
+        <div className="ml-auto flex gap-8">
+          {/* Admin links */}
+          {isAdmin &&
+            Object.entries(adminProtectedLinks).map((link) => (
+              <Link
+                key={link[0]}
+                href={link[1]}
+                className={`${"link"} ${
+                  currentURL === link[1] ? "underline" : "no-underline"
+                }`}
+              >
+                {link[0]}
+              </Link>
+            ))}
+
+          {/* General links */}
+          {Object.entries(unprotectedLinks).map((link) => (
+            <Link
+              key={link[0]}
+              href={link[1]}
+              className={`${"link"} ${
+                currentURL === link[1] ? "underline" : "no-underline"
+              }`}
+            >
+              {link[0]}
+            </Link>
+          ))}
+
+          {/* Action buttons */}
+          <button
+            className="link-primary link no-underline"
+            onClick={() => openModal()}
+          >
+            Create
+          </button>
+          <button
+            disabled={signOutDisabled}
+            onClick={() => void handleSignOut()}
+            title="Sign out"
+            className="text-red-500 outline-2 outline-offset-2 outline-current focus:outline disabled:text-gray-500 hover:text-red-700"
+          >
+            <FiLogOut />
+          </button>
+        </div>
+      </div>
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={closeModal}>
           {/* The screen darkening part */}
@@ -363,53 +427,7 @@ const Header: FC = () => {
           </div>
         </Dialog>
       </Transition>
-
-      <Image src="/logoV3.png" alt="logo" width={40} height={40} className="" />
-      <div className="ml-auto flex gap-8">
-        {/* Admin links */}
-        {isAdmin &&
-          Object.entries(adminProtectedLinks).map((link) => (
-            <Link
-              key={link[0]}
-              href={link[1]}
-              className={`${"link"} ${
-                currentURL === link[1] ? "underline" : "no-underline"
-              }`}
-            >
-              {link[0]}
-            </Link>
-          ))}
-
-        {/* General links */}
-        {Object.entries(unprotectedLinks).map((link) => (
-          <Link
-            key={link[0]}
-            href={link[1]}
-            className={`${"link"} ${
-              currentURL === link[1] ? "underline" : "no-underline"
-            }`}
-          >
-            {link[0]}
-          </Link>
-        ))}
-
-        {/* Action buttons */}
-        <button
-          className="link-primary link no-underline"
-          onClick={() => openModal()}
-        >
-          Create
-        </button>
-        <button
-          disabled={signOutDisabled}
-          onClick={() => void handleSignOut()}
-          title="Sign out"
-          className="text-red-500 outline-2 outline-offset-2 outline-current focus:outline disabled:text-gray-500 hover:text-red-700"
-        >
-          <FiLogOut />
-        </button>
-      </div>
-    </div>
+    </>
   );
 };
 
