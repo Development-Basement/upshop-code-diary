@@ -140,7 +140,7 @@ const EditRecord: FC<EditRecordProps> = (props) => {
             {...register("programmingLanguage")}
           />
 
-          <div className="">
+          <div className="-mt-1">
             <label
               htmlFor="language"
               className=" mr-1 text-sm font-light text-slate-400"
@@ -167,7 +167,7 @@ const EditRecord: FC<EditRecordProps> = (props) => {
             } input w-full`}
           />
 
-          <div className="">
+          <div className="-mt-1">
             <label
               htmlFor="date"
               className=" mr-1 text-sm font-light text-slate-400"
@@ -243,7 +243,7 @@ const EditRecord: FC<EditRecordProps> = (props) => {
             </div>
           </div>
 
-          <div className="">
+          <div className="-mt-1">
             <label
               htmlFor="timeSpent"
               className=" mr-1 text-sm font-light text-slate-400"
@@ -260,15 +260,15 @@ const EditRecord: FC<EditRecordProps> = (props) => {
         <div className="flex flex-col gap-1">
           <textarea
             id="description"
-            rows={4}
+            rows={2}
             className={`${
-              errors.description ? "input-error" : "input-primary"
-            } input w-full`}
+              errors.description ? "textarea-error" : "textarea-primary"
+            } textarea w-full`}
             placeholder="my description"
             {...register("description")}
           />
 
-          <div className="">
+          <div className="-mt-1">
             <label
               htmlFor="description"
               className=" mr-1 text-sm font-light text-slate-400"
@@ -285,7 +285,7 @@ const EditRecord: FC<EditRecordProps> = (props) => {
         <div className="flex flex-col gap-1">
           <Stars rating={ratingValue} setRating={setRatingValue} />
 
-          <div className="">
+          <div className="-mt-1">
             <label
               htmlFor="rating"
               className=" mr-1 text-sm font-light text-slate-400"
