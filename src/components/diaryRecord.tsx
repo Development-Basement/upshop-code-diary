@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useSession } from "next-auth/react";
 import { Dispatch, SetStateAction, useEffect, useState, type FC } from "react";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { AiFillEdit } from "react-icons/ai";
 import { IoMdClose } from "react-icons/io";
 import { DiaryRecord as DiaryRecordType } from "../server/api/routers/records";
@@ -88,17 +88,10 @@ const EditRecord: FC<EditRecordProps> = (props) => {
 
   const [ratingValue, setRatingValue] = useState(props.rating);
 
-  useEffect(() => {
-    setValue("rating", ratingValue);
-  }, [ratingValue, setValue]);
+  const utils = api.useContext();
+  const { mutate: updateRecord } = api.records.updateRecord.useMutation();
 
-  const onSubmit = (data: DiaryRecordType) => {
-    const timezoneOffset = data.date.getTimezoneOffset();
-    if (timezoneOffset > 0) {
-      data.date = dayts(data.date).subtract(timezoneOffset, "minutes").toDate();
-    } else {
-      data.date = dayts(data.date).add(timezoneOffset, "minutes").toDate();
-    }
+  const onSubmit: SubmitHandler<DiaryRecordType> = (data) => {
     updateRecord(
       {
         id: props.id,
@@ -106,6 +99,7 @@ const EditRecord: FC<EditRecordProps> = (props) => {
       },
       {
         onSuccess: () => {
+          console.log("invalidate");
           void utils.records.listRecords.invalidate();
           void utils.records.listRecordsFromUser.invalidate();
           console.log("invalidated");
@@ -116,8 +110,9 @@ const EditRecord: FC<EditRecordProps> = (props) => {
     props.setIsEditing(false);
   };
 
-  const utils = api.useContext();
-  const { mutate: updateRecord } = api.records.updateRecord.useMutation({});
+  useEffect(() => {
+    setValue("rating", ratingValue);
+  }, [ratingValue, setValue]);
 
   return (
     <div className="mt-2 h-fit bg-tsbg3 p-5 shadow-thin-under-strong">
@@ -155,7 +150,9 @@ const EditRecord: FC<EditRecordProps> = (props) => {
             </label>
 
             {errors.programmingLanguage && (
-              <span className="text-sm text-red-500">must be specified!</span>
+              <span className="text-sm text-red-500">
+                must be specified and at most 30 characters!
+              </span>
             )}
           </div>
         </div>
@@ -302,7 +299,7 @@ const EditRecord: FC<EditRecordProps> = (props) => {
         {errors.rating && <span>{errors.rating.message}</span>}
 
         <div className="flex w-full justify-end">
-          <button type="submit" className="btn-primary btn text-white">
+          <button type="submit" className="btn-primary btn">
             Update
           </button>
         </div>

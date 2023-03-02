@@ -256,7 +256,7 @@ const Header: FC = () => {
 
                         {errors.programmingLanguage && (
                           <span className="text-sm text-red-500">
-                            must be specified!
+                            must be specified and at most 30 characters!
                           </span>
                         )}
                       </div>
@@ -413,10 +413,7 @@ const Header: FC = () => {
                     {errors.rating && <span>{errors.rating.message}</span>}
 
                     <div className="flex w-full justify-end">
-                      <button
-                        type="submit"
-                        className="btn-primary btn text-white"
-                      >
+                      <button type="submit" className="btn-primary btn">
                         Create
                       </button>
                     </div>
