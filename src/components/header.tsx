@@ -27,6 +27,7 @@ const Header: FC = () => {
 
   // Idk, it's not really neccesary to do it this way for a few links, but doesn't hurt either...
   const unprotectedLinks = {
+    Database: "/database",
     Dashboard: "/",
     "My records": "/myRecords",
   };
