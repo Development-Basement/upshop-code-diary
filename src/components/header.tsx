@@ -7,9 +7,11 @@ import { Fragment, useEffect, useState, type FC } from "react";
 import { FiLogOut } from "react-icons/fi";
 // Next font not working with headless Dialog by default, idk why, just set it manually in Dialog.Pannel
 import { zodResolver } from "@hookform/resolvers/zod";
+import Head from "next/head";
 import { useForm } from "react-hook-form";
+import { SubmitHandler } from "react-hook-form/dist/types";
+import { type z } from "zod";
 import { inter } from "../pages/_app";
-import { type DiaryRecord } from "../server/api/routers/records";
 import { DiaryRecordParser } from "../types/record";
 import { api } from "../utils/api";
 import { dayts } from "../utils/day";
@@ -45,12 +47,12 @@ const Header: FC = () => {
   const [isOpen, setIsOpen] = useState(false);
 
   function closeModal() {
+    setIsOpen(false);
     reset();
     setRatingValue(0);
     setHours(0);
     setMinutes(0);
     setSeconds(0);
-    setIsOpen(false);
   }
 
   function openModal() {
@@ -63,6 +65,7 @@ const Header: FC = () => {
   }
 
   const DiaryRecordSchema = DiaryRecordParser.omit({ id: true });
+  type DiaryRecord = z.infer<typeof DiaryRecordSchema>;
 
   const {
     register,
@@ -98,28 +101,95 @@ const Header: FC = () => {
     setValue("rating", ratingValue);
   }, [ratingValue, setValue]);
 
-  const onSubmit = (data: DiaryRecord) => {
-    const timezoneOffset = data.date.getTimezoneOffset();
-    if (timezoneOffset > 0) {
-      data.date = dayts(data.date).subtract(timezoneOffset, "minutes").toDate();
-    } else {
-      data.date = dayts(data.date).add(timezoneOffset, "minutes").toDate();
-    }
-    createRecord({
-      date: data.date,
-      rating: data.rating,
-      timeSpent: data.timeSpent,
-      description: data.description,
-      programmingLanguage: data.programmingLanguage,
-    });
-
-    closeModal();
+  const onSubmit: SubmitHandler<DiaryRecord> = (data) => {
+    createRecord(
+      {
+        date: data.date,
+        rating: data.rating,
+        timeSpent: data.timeSpent,
+        description: data.description,
+        programmingLanguage: data.programmingLanguage,
+      },
+      {
+        onSuccess: () => {
+          void utils.records.listRecords.invalidate();
+          void utils.records.listUserRecords.invalidate();
+          closeModal();
+        },
+      },
+    );
   };
 
+  const utils = api.useContext();
   const { mutate: createRecord } = api.records.createRecord.useMutation();
 
+  const getCurrentLinkKey = () => {
+    const links = { ...unprotectedLinks, ...adminProtectedLinks };
+    const currentLink = Object.entries(links).find(
+      (link) => link[1] === currentURL,
+    );
+    return currentLink?.[0] ?? "CodeDiary"; // lol this syntax
+  };
+  const titleText = `UpShop - ${getCurrentLinkKey()}`;
+
   return (
-    <div className="sticky top-0 flex w-full items-center bg-bgdark1 px-5 py-4 text-lg text-white shadow-thin-under-strong">
+    <>
+      <Head>
+        <title>{titleText}</title>
+      </Head>
+      <div className="sticky top-0 flex w-full items-center bg-bgdark1 px-5 py-4 text-lg text-white shadow-thin-under-strong">
+        <Image
+          src="/logoV3.png"
+          alt="logo"
+          width={40}
+          height={40}
+          className=""
+        />
+        <div className="ml-auto flex gap-8">
+          {/* Admin links */}
+          {isAdmin &&
+            Object.entries(adminProtectedLinks).map((link) => (
+              <Link
+                key={link[0]}
+                href={link[1]}
+                className={`${"link"} ${
+                  currentURL === link[1] ? "underline" : "no-underline"
+                }`}
+              >
+                {link[0]}
+              </Link>
+            ))}
+
+          {/* General links */}
+          {Object.entries(unprotectedLinks).map((link) => (
+            <Link
+              key={link[0]}
+              href={link[1]}
+              className={`${"link"} ${
+                currentURL === link[1] ? "underline" : "no-underline"
+              }`}
+            >
+              {link[0]}
+            </Link>
+          ))}
+
+          {/* Action buttons */}
+          <button
+            className="link-primary link no-underline"
+            onClick={() => openModal()}
+          >
+            Create
+          </button>
+          <button
+            disabled={signOutDisabled}
+            onClick={() => void handleSignOut()}
+            title="Sign out"
+            className="text-red-500 outline-2 outline-offset-2 outline-current focus:outline disabled:text-gray-500 hover:text-red-700"
+          >
+            <FiLogOut />
+          </button>
+        </div>
+      </div>
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-10" onClose={closeModal}>
           {/* The screen darkening part */}
@@ -132,7 +202,7 @@ const Header: FC = () => {
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black bg-opacity-75" />
+            <div className="fixed inset-0 bg-black/75" />
           </Transition.Child>
 
           <div className="fixed inset-0 overflow-y-auto">
@@ -158,8 +228,7 @@ const Header: FC = () => {
 
                   <form
                     className="mt-4 flex flex-col gap-4"
-                    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                    onSubmit={handleSubmit((data) => onSubmit(data))}
+                    onSubmit={(e) => void handleSubmit(onSubmit)(e)}
                   >
                     {/* Language */}
                     <div className="flex flex-col gap-1">
@@ -174,7 +243,7 @@ const Header: FC = () => {
                         {...register("programmingLanguage")}
                       />
 
-                      <div className="">
+                      <div className="-mt-1">
                         <label
                           htmlFor="language"
                           className=" mr-1 text-sm font-light text-slate-400"
@@ -184,7 +253,7 @@ const Header: FC = () => {
 
                         {errors.programmingLanguage && (
                           <span className="text-sm text-red-500">
-                            must be specified!
+                            must be specified and at most 30 characters!
                           </span>
                         )}
                       </div>
@@ -201,7 +270,7 @@ const Header: FC = () => {
                         {...register("date", { valueAsDate: true })}
                       />
 
-                      <div className="">
+                      <div className="-mt-1">
                         <label
                           htmlFor="date"
                           className=" mr-1 text-sm font-light text-slate-400"
@@ -280,7 +349,7 @@ const Header: FC = () => {
                         </div>
                       </div>
 
-                      <div className="">
+                      <div className="-mt-1">
                         <label
                           htmlFor="timeSpent"
                           className=" mr-1 text-sm font-light text-slate-400"
@@ -300,15 +369,17 @@ const Header: FC = () => {
                     <div className="flex flex-col gap-1">
                       <textarea
                         id="description"
-                        rows={4}
+                        rows={2}
                         className={`${
-                          errors.description ? "input-error" : "input-primary"
-                        } input w-full`}
+                          errors.description
+                            ? "textarea-error"
+                            : "textarea-primary"
+                        } textarea w-full`}
                         placeholder="my description"
                         {...register("description")}
                       />
 
-                      <div className="">
+                      <div className="-mt-1">
                         <label
                           htmlFor="description"
                           className=" mr-1 text-sm font-light text-slate-400"
@@ -328,7 +399,7 @@ const Header: FC = () => {
                     <div className="flex flex-col gap-1">
                       <Stars rating={ratingValue} setRating={setRatingValue} />
 
-                      <div className="">
+                      <div className="-mt-1">
                         <label
                           htmlFor="rating"
                           className=" mr-1 text-sm font-light text-slate-400"
@@ -341,10 +412,7 @@ const Header: FC = () => {
                     {errors.rating && <span>{errors.rating.message}</span>}
 
                     <div className="flex w-full justify-end">
-                      <button
-                        type="submit"
-                        className="btn-primary btn text-white"
-                      >
+                      <button type="submit" className="btn-primary btn">
                         Create
                       </button>
                     </div>
@@ -355,53 +423,7 @@ const Header: FC = () => {
           </div>
         </Dialog>
       </Transition>
-
-      <Image src="/logoV3.png" alt="logo" width={40} height={40} className="" />
-      <div className="ml-auto flex gap-8">
-        {/* Admin links */}
-        {isAdmin &&
-          Object.entries(adminProtectedLinks).map((link) => (
-            <Link
-              key={link[0]}
-              href={link[1]}
-              className={`${"link"} ${
-                currentURL === link[1] ? "underline" : "no-underline"
-              }`}
-            >
-              {link[0]}
-            </Link>
-          ))}
-
-        {/* General links */}
-        {Object.entries(unprotectedLinks).map((link) => (
-          <Link
-            key={link[0]}
-            href={link[1]}
-            className={`${"link"} ${
-              currentURL === link[1] ? "underline" : "no-underline"
-            }`}
-          >
-            {link[0]}
-          </Link>
-        ))}
-
-        {/* Action buttons */}
-        <button
-          className="link-primary link no-underline"
-          onClick={() => openModal()}
-        >
-          Create
-        </button>
-        <button
-          disabled={signOutDisabled}
-          onClick={() => void handleSignOut()}
-          title="Sign out"
-          className="text-red-500 outline-2 outline-offset-2 outline-current focus:outline disabled:text-gray-500 hover:text-red-700"
-        >
-          <FiLogOut />
-        </button>
-      </div>
-    </div>
+    </>
   );
 };
 

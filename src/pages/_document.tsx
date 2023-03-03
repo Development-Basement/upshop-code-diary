@@ -8,7 +8,9 @@ export default function Document() {
       data-theme={DEFAULT_THEME}
       className={DEFAULT_THEME === "dark" ? "dark" : undefined}
     >
-      <Head></Head>
+      <Head>
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
       <body>
         <Main />
         <NextScript />

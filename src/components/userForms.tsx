@@ -4,6 +4,7 @@ import { Fragment, useRef, useState, type FC } from "react";
 import { useForm } from "react-hook-form";
 import { type SubmitHandler } from "react-hook-form/dist/types";
 import { z } from "zod";
+import { inter } from "../pages/_app";
 import { api } from "../utils/api";
 
 type UserFormProps = {
@@ -393,7 +394,9 @@ export const EditUserForm: FC<EditUserFormProps> = ({
           {/* Full-screen container to center the panel */}
           <div className="fixed inset-0 flex items-center justify-center p-4">
             {/* The actual dialog panel  */}
-            <Dialog.Panel className="w-full max-w-lg overflow-hidden rounded-2xl bg-bgdark1 p-8 text-left align-middle text-white shadow-xl transition-all">
+            <Dialog.Panel
+              className={`${inter.variable} w-full max-w-lg overflow-hidden rounded-2xl bg-bgdark1 p-8 text-left align-middle font-sans text-white shadow-xl transition-all`}
+            >
               <Dialog.Title as="h3" className="text-xl font-medium leading-6">
                 Are you sure you want to delete this user?
               </Dialog.Title>

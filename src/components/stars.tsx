@@ -28,6 +28,7 @@ const Stars: FC<StarProps> = ({ rating, setRating }) => {
               setRating(rating === i ? 0 : i);
             }
           }}
+          onChange={() => {}}
           value={i}
           key={i}
         />
