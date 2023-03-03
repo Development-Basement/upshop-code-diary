@@ -336,10 +336,10 @@ const ViewRecord: FC<ViewRecordProps> = (props) => {
           </button>
         )}
       </div>
-      <p className="mb-2">{`${props.date.getDate()}. ${
+      <div className="mb-2">{`${props.date.getDate()}. ${
         props.date.getMonth() + 1
-      }. ${props.date.getFullYear()}`}</p>
-      <div className="mb-2">{props.description}</div>
+      }. ${props.date.getFullYear()}`}</div>
+      <p className="mb-2 whitespace-pre-line">{props.description}</p>
       <Stars rating={props.rating} />
     </div>
   );
