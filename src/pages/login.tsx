@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { type NextPage } from "next";
+import { type GetServerSidePropsContext, type NextPage } from "next";
 import { signIn } from "next-auth/react";
 import Head from "next/head";
 import Image from "next/image";
@@ -9,8 +9,9 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { z } from "zod";
 import textLogo from "../../public/textLogo.png";
 import PageWrapper from "../components/pageWrapper";
+import { getServerAuthSession } from "../server/auth";
 
-const Dashboard: NextPage = () => {
+const Login: NextPage = () => {
   const schema = z.object({
     password: z.string().min(1),
     username: z.string().min(1),
@@ -94,4 +95,21 @@ const Dashboard: NextPage = () => {
   );
 };
 
-export default Dashboard;
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const session = await getServerAuthSession(context);
+
+  if (session) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {},
+  };
+}
+
+export default Login;
