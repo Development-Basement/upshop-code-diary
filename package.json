@@ -31,6 +31,7 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.43.2",
     "react-icons": "^4.7.1",
+    "sharp": "^0.31.3",
     "superjson": "1.9.1",
     "tailwind-scrollbar": "^2.1.0",
     "zod": "^3.20.2"

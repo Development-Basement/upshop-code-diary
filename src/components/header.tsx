@@ -1,15 +1,14 @@
 import { Dialog, Transition } from "@headlessui/react";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { signOut, useSession } from "next-auth/react";
+import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { Fragment, useEffect, useState, type FC } from "react";
-import { FiLogOut } from "react-icons/fi";
-// Next font not working with headless Dialog by default, idk why, just set it manually in Dialog.Pannel
-import { zodResolver } from "@hookform/resolvers/zod";
-import Head from "next/head";
 import { useForm } from "react-hook-form";
-import { SubmitHandler } from "react-hook-form/dist/types";
+import { type SubmitHandler } from "react-hook-form/dist/types";
+import { FiLogOut } from "react-icons/fi";
 import { type z } from "zod";
 import { inter } from "../pages/_app";
 import { DiaryRecordParser } from "../types/record";
