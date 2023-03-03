@@ -22,7 +22,7 @@ const ProfileDisplay: FC<ProfileDisplayProps> = ({
   const isSelf = userData?.user.id === id;
   return (
     <div
-      className={`mt-2 h-fit bg-tsbg1 p-5 shadow-thin-under-strong outline-1 outline-bgdark1 ${
+      className={`mt-2 h-fit snap-start bg-tsbg1 p-5 shadow-thin-under-strong outline-1 outline-bgdark1 ${
         isSelf ? "outline" : ""
       }`}
     >

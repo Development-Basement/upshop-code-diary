@@ -21,7 +21,7 @@ const DiaryRecord: FC<DiaryRecordProps> = (props) => {
   const [isEditing, setIsEditing] = useState(false);
 
   return (
-    <div>
+    <div className="snap-start">
       {isEditing ? (
         <EditRecord {...props} setIsEditing={setIsEditing} />
       ) : (
