@@ -322,7 +322,7 @@ const EditRecord: FC<EditRecordProps> = (props) => {
               }`}
               disabled={updatingRecord}
             >
-              {updatingRecord ? "updating..." : "upadte"}
+              {updatingRecord ? "updating..." : "update"}
             </button>
             <button
               className="btn-error btn"
