@@ -1,5 +1,7 @@
 # UpShop code-diary
 
+[![Build and push to TdA](https://github.com/Development-Basement/upshop-code-diary/actions/workflows/release.yml/badge.svg)](https://github.com/Development-Basement/upshop-code-diary/actions/workflows/release.yml)
+
 This is a project from the competition round of the [Tour de App](https://tourdeapp.cz/) 2022 competition.
 The goal is to create an app for UpShop (the "client") to monitor it's employees' personal growth.
 We are "modifying" (read: "recreating from the ground up") our app from the nomination round.
