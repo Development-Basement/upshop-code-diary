@@ -358,6 +358,13 @@ export const EditUserForm: FC<EditUserFormProps> = ({
         </form>
         <div className="mt-2 flex flex-row">
           <button
+            className="btn order-last ml-auto"
+            type="button"
+            onClick={closeForm}
+          >
+            close
+          </button>
+          <button
             className="btn-error btn"
             disabled={deleteModalOpen}
             onClick={(e) => {
@@ -366,9 +373,6 @@ export const EditUserForm: FC<EditUserFormProps> = ({
             }}
           >
             delete
-          </button>
-          <button className="btn ml-auto" type="button" onClick={closeForm}>
-            close
           </button>
         </div>
       </div>
