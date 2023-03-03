@@ -9,6 +9,7 @@ import { Fragment, useEffect, useState, type FC } from "react";
 import { useForm } from "react-hook-form";
 import { type SubmitHandler } from "react-hook-form/dist/types";
 import { FiLogOut } from "react-icons/fi";
+import { IoMdClose } from "react-icons/io";
 import { type z } from "zod";
 import { inter } from "../pages/_app";
 import { DiaryRecordParser } from "../types/record";
@@ -120,7 +121,11 @@ const Header: FC = () => {
   };
 
   const utils = api.useContext();
-  const { mutate: createRecord } = api.records.createRecord.useMutation();
+  const {
+    mutate: createRecord,
+    error: creationError,
+    isLoading: creatingRecord,
+  } = api.records.createRecord.useMutation();
 
   const getCurrentLinkKey = () => {
     const links = { ...unprotectedLinks, ...adminProtectedLinks };
@@ -218,13 +223,20 @@ const Header: FC = () => {
                 <Dialog.Panel
                   className={`w-full max-w-md overflow-hidden rounded-2xl bg-bgdark1 p-6 text-left align-middle font-sans ${inter.variable} text-white shadow-xl transition-all`}
                 >
-                  <Dialog.Title
-                    as="h3"
-                    className="text-lg font-medium leading-6"
-                  >
-                    Create new record
-                  </Dialog.Title>
-
+                  <div className="flex">
+                    <Dialog.Title
+                      as="h3"
+                      className="text-lg font-medium leading-6"
+                    >
+                      Create new record
+                    </Dialog.Title>
+                    <button
+                      className="btn-ghost btn-square btn-sm btn ml-auto"
+                      onClick={() => closeModal()}
+                    >
+                      <IoMdClose className="text-2xl" />
+                    </button>
+                  </div>
                   <form
                     className="mt-4 flex flex-col gap-4"
                     onSubmit={(e) => void handleSubmit(onSubmit)(e)}
@@ -393,11 +405,9 @@ const Header: FC = () => {
                         )}
                       </div>
                     </div>
-
                     {/* Rating */}
                     <div className="flex flex-col gap-1">
                       <Stars rating={ratingValue} setRating={setRatingValue} />
-
                       <div className="-mt-1">
                         <label
                           htmlFor="rating"
@@ -407,12 +417,23 @@ const Header: FC = () => {
                         </label>
                       </div>
                     </div>
-
                     {errors.rating && <span>{errors.rating.message}</span>}
 
+                    {creationError && (
+                      <p className="-mb-2 flex flex-col text-sm text-error">
+                        There was an error chaning the record:{" "}
+                        {creationError.message}
+                      </p>
+                    )}
                     <div className="flex w-full justify-end">
-                      <button type="submit" className="btn-primary btn">
-                        Create
+                      <button
+                        type="submit"
+                        disabled={creatingRecord}
+                        className={`btn-primary btn ${
+                          creatingRecord ? "loading" : ""
+                        }`}
+                      >
+                        {creatingRecord ? "creating..." : "create"}
                       </button>
                     </div>
                   </form>

@@ -99,7 +99,7 @@ const handler: NextApiHandler<HandlerOutput> = async (req, res) => {
       throw new Error("Invalid user_id");
     }
     if (method === "GET") {
-      const records = await caller.records.listRecordsFromUser({
+      const records = await caller.records.unsafe.listRecordsFromUser({
         userId: user_id,
       });
       res

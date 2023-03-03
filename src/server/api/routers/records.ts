@@ -18,6 +18,29 @@ export type DiaryRecordWithUser = z.infer<typeof DiaryRecordWithUserParser>;
 // ENHANCE: it could've been better to extract these into functions so we can use them in both the safe and unsafe routers
 // I didn't do it, because passing the whole context and input would be a bit messy
 const extApiRouter = createTRPCRouter({
+  listRecordsFromUser: publicProcedure
+    .input(
+      z.object({
+        userId: z.string().min(1),
+      }),
+    )
+    .output(z.array(DiaryRecordParser))
+    .query(async ({ ctx, input }) => {
+      const records = await ctx.prisma.record.findMany({
+        where: {
+          userId: input.userId,
+        },
+        select: {
+          id: true,
+          date: true,
+          timeSpent: true,
+          programmingLanguage: true,
+          rating: true,
+          description: true,
+        },
+      });
+      return records;
+    }),
   /**
    * **ALWAYS** make sure userId is valid!!!
    */
@@ -167,36 +190,17 @@ export const recordsRouter = createTRPCRouter({
       };
     }),
 
-  listRecordsFromUser: publicProcedure
-    .input(
-      z.object({
-        userId: z.string().min(1),
-      }),
-    )
-    .output(z.array(DiaryRecordParser))
-    .query(async ({ ctx, input }) => {
-      const records = await ctx.prisma.record.findMany({
-        where: {
-          userId: input.userId,
-        },
-        select: {
-          id: true,
-          date: true,
-          timeSpent: true,
-          programmingLanguage: true,
-          rating: true,
-          description: true,
-        },
-      });
-      return records;
-    }),
-
-  // I dunno weather you take userId as input beacuse of the api, but I prefre checking on the server...
   listUserRecords: protectedProcedure
     .input(
       z.object({
         cursor: z.string().nullish(),
         limit: z.number().min(1).max(100).default(20),
+      }),
+    )
+    .output(
+      z.object({
+        records: z.array(DiaryRecordWithUserParser),
+        nextCursor: z.string().nullish(),
       }),
     )
     .query(async ({ ctx, input }) => {
