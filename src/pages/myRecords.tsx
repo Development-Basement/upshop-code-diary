@@ -22,7 +22,7 @@ const MyRecords: NextPage = () => {
             <DiaryRecord
               key={record.id}
               id={record.id}
-              userId={record.userId}
+              userId={record.user.id}
               userName={record.user.name}
               programmingLanguage={record.programmingLanguage}
               timeSpent={record.timeSpent}
