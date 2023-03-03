@@ -95,7 +95,7 @@ const EditRecord: FC<EditRecordProps> = (props) => {
   const {
     mutate: updateRecord,
     error: updateError,
-    isLoading: editingRecord,
+    isLoading: updatingRecord,
   } = api.records.updateRecord.useMutation();
   const {
     mutate: deleteRecord,
@@ -317,9 +317,12 @@ const EditRecord: FC<EditRecordProps> = (props) => {
           <div className="flex w-full justify-end">
             <button
               type="submit"
-              className="btn-primary btn order-last ml-auto"
+              className={`btn-primary btn order-last ml-auto ${
+                updatingRecord ? "loading" : ""
+              }`}
+              disabled={updatingRecord}
             >
-              Update
+              {updatingRecord ? "updating..." : "upadte"}
             </button>
             <button
               className="btn-error btn"
